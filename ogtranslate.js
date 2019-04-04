@@ -13,6 +13,24 @@ See TODO.taskpaper for notes on accessing objects in OmniGraffle
 
 */
 
+/* ---------- standard require function ------------ */
+var require = function (path) {
+  if (typeof app === 'undefined') { // eslint-disable-line no-use-before-define
+    var app = Application.currentApplication() // eslint-disable-line no-undef
+    app.includeStandardAdditions = true
+  }
+  var handle = app.openForAccess(path)
+  var contents = app.read(handle)
+  app.closeAccess(path)
+  var module = { exports: {} }
+  var exports = module.exports // eslint-disable-line no-unused-vars
+  eval(contents) // eslint-disable-line no-eval
+  return module.exports
+}
+/* ---------- end standard require function ------------ */
+
+var [writeTextToFile, readFile] = require('./modules/file_io.js')
+
 var logger = new SimpleLogger(console.log)
 
 var visitedNodes = new NodesVisited()
@@ -39,7 +57,7 @@ function run (argv) { // eslint-disable-line no-unused-vars
   }
 
   var Command = COMMANDS[parameters.command]
-  let cmd = new Command()
+  let cmd = new Command(parameters)
 
   var OmniGraffle = Application('OmniGraffle') // eslint-disable-line no-undef
   OmniGraffle.includeStandardAdditions = true
@@ -73,11 +91,11 @@ function partial (func, ...argsBound) {
   }
 }
 
-function CommandExtractStrings () {
+function CommandExtractStrings (parameters) {
   this.texts = new TextRepository()
 
   this.extractStrings = function (texts, item, context) {
-  // a callback for exracting strings into a TextRepository()
+  // a callback for extracting strings into a TextRepository()
 
     function itemHasText (item) {
       return (TEXT_CONTAINERS.includes(item.class()))
@@ -106,14 +124,23 @@ function CommandExtractStrings () {
   this.finish = this.texts.dump.bind(this.texts)
 }
 
-function CommandInjectStrings () {
+function CommandInjectStrings (parameters) {
   this.finish = partial(console.log, 'finished')
   this.callback = function (item, context) {
   }
 }
 
-function CommandAnalyzeObjects () {
-  this.counter = new CLassCounter()
+function CommandAnalyzeObjects (parameters) {
+  // "analyze" command
+
+  // set up logger to write to file
+  function logToFile (file, ...texts) {
+    texts.push("\r\n")
+    writeTextToFile(texts.join(' '), file)
+  }
+  logger._logCallback = partial(logToFile, parameters.target)
+
+  this.counter = new ClassCounter()
   this.countClasses = function (counter, item, context) {
     // item.id() // uncommenting this causes children ot be inaccesible
     counter.count(item.class())
@@ -210,7 +237,8 @@ function setParameters (argv) {
   var source = argv[1]
   var target = argv[2]
   var myproperties = argv.slice(3)
-  logger.log(logger.debug, 'Exporting OmniGraffle document -------------------------------------------')
+  // TODO: log output can start only AFTER the log target has been determined!!
+  logger.log(logger.debug, 'Processing OmniGraffle document -------------------------------------------')
   logger.log(logger.debug, `Command: ${command}`)
   logger.log(logger.debug, `Source: ${source}`)
   logger.log(logger.debug, `Target: ${target}`)
@@ -231,7 +259,7 @@ function setParameters (argv) {
     properties: properties
   }
 
-  // TODO: this must be generated from COMMANDS
+  // TODO: this should be generated from COMMANDS
   var validCommands = ['inject', 'extract', 'analyze']
 
   if (!validCommands.includes(parameters.command)) {
@@ -255,10 +283,9 @@ function SimpleLogger (callback) {
   this.logNested = function (level, indent, string) {
     this.log(level, this.spacer.repeat(indent) + string)
   }
-  this.log = function (level, string) {
-    // TODO: log variable number of arguments (how to do this in JS? apply and arguments[]?)
+  this.log = function (level, ...string) {
     if (level <= this.logThreshold) {
-      this._logCallback(string)
+      this._logCallback(...string)
     }
   }
 }
@@ -283,7 +310,7 @@ function TextRepository () {
   }
 }
 
-function CLassCounter () {
+function ClassCounter () {
   this.classes = new Map()
   this.count = function (klass) {
     if (!this.classes.has(klass)) {
