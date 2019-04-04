@@ -1,17 +1,16 @@
 create a separate Github Project:
 	- create & clone a new repo @done
-	- set up branches (develoment at least) and git flow
-	- make a project for Sublime Text with eslint etc.
-	- copy all JXA files from here to there
-	- remove files from here
-	- copy all relevant documentation from ogtool repo
-	- see if https://pypi.org/project/py-applescript/ might be a way to resurrect ogtool
-	- move all JXA related info from this document to a separate readme-file (markdown!)
-	- raise id() problem with OmniGraffle support
+	- set up branches (develoment at least) and git flow @done
+	- make a project for Sublime Text with eslint etc. @done
+	- copy all JXA files from here to there @done
+	- remove JXA files from other repo @done
+	- copy all relevant documentation from ogtool repo @done
+	- move all JXA related info from this document to a separate readme-file (markdown!) @done
 known problems:
 	- can't access shared layers from JXA
 	- export is broken, OmniGroup support is investigatign this, might be related to shared layers problem
 	- accessing ids of items in the document (e.g. via doc.canvases[0].layers[0].graphics[0].id()) prevents the script from accessing all elements (need to raise this with OG support)
+		- raise id() problem with OmniGraffle support
 ogexport (JXA):
 	- write a small parser for commandline arguments and store them in associative array @done
 	✔ finish basic export for PNG @done (19-03-15 11:39)
