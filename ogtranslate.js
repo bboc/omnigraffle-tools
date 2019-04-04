@@ -47,7 +47,7 @@ const TEXT_CONTAINERS = ['graphic', 'incomingline', 'label', 'line', 'outgoingli
 function run (argv) { // eslint-disable-line no-unused-vars
   var parameters = setParameters(argv)
 
-  logger.setLogThreshold(logger.debug+5)
+  logger.setLogThreshold(logger.DEBUG+5)
   // open app if not already open
   var appOpened = false
   if (!Application('OmniGraffle').running()) { // eslint-disable-line no-undef
@@ -73,8 +73,8 @@ function run (argv) { // eslint-disable-line no-unused-vars
     OmniGraffle.close()
   }
   cmd.finish()
-  logger.log(logger.info, '...done')
-  logger.log(logger.info, `numberOfNodes ${numberOfNodes}`)
+  logger.info('...done')
+  logger.info(`numberOfNodes ${numberOfNodes}`)
 }
 
 function exportName (filename) {
@@ -104,10 +104,10 @@ function CommandExtractStrings (parameters) {
     if (itemHasText(item) && item.text()) {
       // element has more than zero length accessible text
 
-      logger.log(logger.debug, `text: "${item.text()}"`)
+      logger.debug(`text: "${item.text()}"`)
       texts.addText(item.text(), context)
       // for (const text of item.text.attributeRuns()) {
-      //   console.log('a text', text)
+      //   logger.info('a text', text)
       // }
     }
 
@@ -133,16 +133,15 @@ function CommandInjectStrings (parameters) {
 function CommandAnalyzeObjects (parameters) {
   // "analyze" command
 
-  // set up logger to write to file
+  // set up logger to write to file instead of standard output
   function logToFile (file, ...texts) {
-    texts.push("\r\n")
+    texts.push('\r\n')
     writeTextToFile(texts.join(' '), file)
   }
   logger._logCallback = partial(logToFile, parameters.target)
 
   this.counter = new ClassCounter()
   this.countClasses = function (counter, item, context) {
-    // item.id() // uncommenting this causes children ot be inaccesible
     counter.count(item.class())
   }
 
@@ -153,7 +152,7 @@ function CommandAnalyzeObjects (parameters) {
 
 function traverseItems (item, callback, context = {}, indent = 0) {
   // traverse a document to visit all items
-  // console.log("id:", item.id())
+  // logger.info("id:", item.id())
   // if (visitedNodes.contains(item.id())) {
   //   return // don't visit twice!
   // }
@@ -161,11 +160,14 @@ function traverseItems (item, callback, context = {}, indent = 0) {
   var children
   numberOfNodes += 1
 
-  logger.logNested(logger.debug, indent, `traverse "${item.class()}" {`)
+  logger.logNested(logger.DEBUG, indent, `found a "${item.class()}" {`)
+  // FIXME: this breaks it completely, resulting in only 6 Objects (instead of 135 being found)
+  // item.id()
+
   switch (item.class()) {
     case 'canvas':
       // contains graphics, groups, layers, lines, shapes, solids, subgraphs;
-      logger.logNested(logger.debug, indent + 1, `name: "${item.name()}"`)
+      logger.logNested(logger.DEBUG, indent + 1, `name: "${item.name()}"`)
       children = ['layers']
       context.canvas = item.name()
       context.layer = ''
@@ -173,8 +175,8 @@ function traverseItems (item, callback, context = {}, indent = 0) {
       break
     case 'layer':
     case 'sharedLayer':
-      logger.logNested(logger.debug, indent + 1, `name: "${item.name()}"`)
-      // logger.logNested(logger.info, indent + 1, ` ${item.class()} name: "${item.name()}"`)
+      logger.logNested(logger.DEBUG, indent + 1, `name: "${item.name()}"`)
+      // logger.logNested(logger.INFO, indent + 1, ` ${item.class()} name: "${item.name()}"`)
       if (!item.visible) {
         return // skip invisible layers
       }
@@ -206,28 +208,28 @@ function traverseItems (item, callback, context = {}, indent = 0) {
       children = []
       break
     default:
-      logger.log(logger.error, `ERROR unknown class: "${item.class()}"`)
+      logger.error(`ERROR unknown class: "${item.class()}"`)
   }
 
   callback(item, context)
 
   for (var c of children) {
     // debugger;
-    logger.logNested(logger.debug, indent + 1, `testing collection '${c}' {`)
+    logger.logNested(logger.DEBUG, indent + 1, `checking '${c}' {`)
     try {
       for (var subitem of item[c]()) {
-        logger.logNested(logger.debug + 5, indent + 2, `type: '${subitem.class()}'`)
+        // FIXME: this next line also makes a difference of 119 / 135 objects found!!
+        // let foo = subitem.class()
         traverseItems(subitem, callback, context, indent + 2)
       }
-      logger.logNested(logger.debug + 5, indent + 2, `finished ${c}`)
     } catch (error) {
-      logger.logNested(logger.debug + 5, indent + 2, `...skipped collection ${c} because of ${JSON.stringify(error)}`)
+      logger.logNested(logger.DEBUG + 5, indent + 2, `...skipped collection ${c} because of ${JSON.stringify(error)}`)
       // TODO: remove this after everything works
-      //throw error
+      // throw error
     }
-    logger.logNested(logger.debug, indent + 1, '}')
+    logger.logNested(logger.DEBUG, indent + 1, '}') // end of collection
   }
-  logger.logNested(logger.debug, indent, '}')
+  logger.logNested(logger.DEBUG, indent, '}') // end of item
 }
 
 function setParameters (argv) {
@@ -238,11 +240,11 @@ function setParameters (argv) {
   var target = argv[2]
   var myproperties = argv.slice(3)
   // TODO: log output can start only AFTER the log target has been determined!!
-  logger.log(logger.debug, 'Processing OmniGraffle document -------------------------------------------')
-  logger.log(logger.debug, `Command: ${command}`)
-  logger.log(logger.debug, `Source: ${source}`)
-  logger.log(logger.debug, `Target: ${target}`)
-  logger.log(logger.debug, `Properties: ${JSON.stringify(myproperties)}`)
+  logger.debug('Processing OmniGraffle document -------------------------------------------')
+  logger.debug(`Command: ${command}`)
+  logger.debug(`Source: ${source}`)
+  logger.debug(`Target: ${target}`)
+  logger.debug(`Properties: ${JSON.stringify(myproperties)}`)
 
   // set defaults for properties
   var properties = {}
@@ -271,22 +273,35 @@ function setParameters (argv) {
 function SimpleLogger (callback) {
   this.spacer = '  '
   this._logCallback = callback
-  this.debug = 3
-  this.info = 2
-  this.warning = 1
-  this.error = 0
+  this.DEBUG = 3
+  this.INFO = 2
+  this.WARNING = 1
+  this.ERROR = 0
   this.logThreshold = this.warning
 
   this.setLogThreshold = function (level) {
     this.logThreshold = level
   }
-  this.logNested = function (level, indent, string) {
-    this.log(level, this.spacer.repeat(indent) + string)
-  }
-  this.log = function (level, ...string) {
+  this._log = function (level, ...string) {
     if (level <= this.logThreshold) {
       this._logCallback(...string)
     }
+  }
+  this.logNested = function (level, indent, string) {
+    // special logger function to easily visualize a nested object model
+    this._log(level, this.spacer.repeat(indent) + string)
+  }
+  this.error = function (...text) {
+    this._log(this.ERROR, ...text)
+  }
+  this.warning = function (...text) {
+    this._log(this.WARNING, ...text)
+  }
+  this.info = function (...text) {
+    this._log(this.INFO, ...text)
+  }
+  this.debug = function (...text) {
+    this._log(this.DEBUG, ...text)
   }
 }
 
@@ -304,8 +319,8 @@ function TextRepository () {
   }
   this.dump = function () {
     for (var [text, context] of this.texts) {
-      console.log('text', text)
-      console.log('context', JSON.stringify(context))
+      logger.info('text', text)
+      logger.info('context', JSON.stringify(context))
     }
   }
 }
@@ -321,7 +336,7 @@ function ClassCounter () {
   }
   this.dump = function () {
     for (var [klass, num] of this.classes) {
-      console.log(`${klass} : ${num}`)
+      logger.info(`${klass} : ${num}`)
     }
   }
 }
