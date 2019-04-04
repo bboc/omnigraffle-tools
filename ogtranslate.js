@@ -176,7 +176,6 @@ function traverseItems (item, callback, context = {}, indent = 0) {
     case 'layer':
     case 'sharedLayer':
       logger.logNested(logger.DEBUG, indent + 1, `name: "${item.name()}"`)
-      // logger.logNested(logger.INFO, indent + 1, ` ${item.class()} name: "${item.name()}"`)
       if (!item.visible) {
         return // skip invisible layers
       }
