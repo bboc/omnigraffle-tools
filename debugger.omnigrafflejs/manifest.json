@@ -1,0 +1,13 @@
+{
+ "author": "YOU",
+ "identifier": "debugger.bboc.OmniGraffle",
+ "version": "0.1",
+ "description": "Runs a debugger.",
+ "actions": [
+   {
+     "image": "king-of-dudes.jpg",
+     "identifier": "debugger"
+   }
+ ],
+ "defaultLocale": "en"
+}
