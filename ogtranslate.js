@@ -47,7 +47,7 @@ const TEXT_CONTAINERS = ['graphic', 'incomingline', 'label', 'line', 'outgoingli
 function run (argv) { // eslint-disable-line no-unused-vars
   var parameters = setParameters(argv)
 
-  logger.setLogThreshold(logger.DEBUG+5)
+  logger.setLogThreshold(logger.INFO)
   // open app if not already open
   var appOpened = false
   if (!Application('OmniGraffle').running()) { // eslint-disable-line no-undef
@@ -181,7 +181,7 @@ function traverseItems (logger, item, callback, context = {}, indent = 0) {
   var children
   numberOfNodes += 1
   logger.logNested(logger.DEBUG, indent, `found a "${item.class()}" {`)
-  //logger.logNested(logger.DEBUG, indent, `found a "${JSON.stringify(item.properties())}" {`)
+  // logger.logNested(logger.DEBUG, indent, `found a "${JSON.stringify(item.properties())}" {`)
   // FIXME: this breaks it completely, resulting in only 6 Objects (instead of 135 being found)
   // item.id()
 
@@ -204,7 +204,7 @@ function traverseItems (logger, item, callback, context = {}, indent = 0) {
   }
 
   callback(item, context)
-  
+
   children = getChildCollections(item.class())
 
   for (var c of children) {
