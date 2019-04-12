@@ -64,7 +64,7 @@ function run (argv) { // eslint-disable-line no-unused-vars
   var doc = OmniGraffle.open(parameters.source)
 
   for (const canvas of doc.canvases()) {
-    traverseItems(canvas, cmd.callback)
+    traverseItems(logger, canvas, cmd.callback)
   }
   doc.close()
 
@@ -150,7 +150,7 @@ function CommandAnalyzeObjects (parameters) {
   this.finish = this.counter.dump.bind(this.counter)
 }
 
-function traverseItems (item, callback, context = {}, indent = 0) {
+function traverseItems (logger, item, callback, context = {}, indent = 0) {
   // traverse a document to visit all items
   // logger.info("id:", item.id())
   // if (visitedNodes.contains(item.id())) {
@@ -159,58 +159,32 @@ function traverseItems (item, callback, context = {}, indent = 0) {
   // visitedNodes.append(item.id())
   var children
   numberOfNodes += 1
-
   logger.logNested(logger.DEBUG, indent, `found a "${item.class()}" {`)
+  //logger.logNested(logger.DEBUG, indent, `found a "${JSON.stringify(item.properties())}" {`)
   // FIXME: this breaks it completely, resulting in only 6 Objects (instead of 135 being found)
   // item.id()
 
   switch (item.class()) {
     case 'canvas':
-      // contains graphics, groups, layers, lines, shapes, solids, subgraphs;
       logger.logNested(logger.DEBUG, indent + 1, `name: "${item.name()}"`)
-      children = ['layers']
       context.canvas = item.name()
       context.layer = ''
-      // children = ['layers', 'graphics', 'groups', 'lines', 'shapes', 'solids', 'subgraphs']
       break
     case 'layer':
     case 'sharedLayer':
       logger.logNested(logger.DEBUG, indent + 1, `name: "${item.name()}"`)
       if (!item.visible) {
-        return // skip invisible layers
+        // skip invisible layers
+        logger.logNested(logger.DEBUG, indent + 1, 'skipped invisible layer')
+        return
       }
       context.layer = item.name()
-      children = ['graphics', 'groups', 'lines', 'solids', 'shapes', 'subgraphs']
       break
-    case 'group':
-    case 'subgraph': // a group
-    case 'table': // a group
-      children = ['graphics', 'groups', 'solids', 'shapes', 'subgraphs']
-      break
-    case 'tableslice':
-    case 'row':
-    case 'column':
-      children = ['graphics']
-      break
-    case 'graphic':
-      // contains incomingLines, lines, outgoingLines, userDataItems;
-      children = ['incomingLines', 'lines', 'outgoingLines']
-      break
-    case 'incomingline':
-    case 'outgoingline':
-    case 'line':
-      children = ['labels']
-      break
-    case 'shape':
-    case 'solid':
-    case 'label':
-      children = []
-      break
-    default:
-      logger.error(`ERROR unknown class: "${item.class()}"`)
   }
 
   callback(item, context)
+  
+  children = getChildCollections(item.class())
 
   for (var c of children) {
     // debugger;
@@ -219,7 +193,7 @@ function traverseItems (item, callback, context = {}, indent = 0) {
       for (var subitem of item[c]()) {
         // FIXME: this next line also makes a difference of 119 / 135 objects found!!
         // let foo = subitem.class()
-        traverseItems(subitem, callback, context, indent + 2)
+        traverseItems(logger, subitem, callback, context, indent + 2)
       }
     } catch (error) {
       logger.logNested(logger.DEBUG + 5, indent + 2, `...skipped collection ${c} because of ${JSON.stringify(error)}`)
@@ -229,6 +203,40 @@ function traverseItems (item, callback, context = {}, indent = 0) {
     logger.logNested(logger.DEBUG, indent + 1, '}') // end of collection
   }
   logger.logNested(logger.DEBUG, indent, '}') // end of item
+}
+
+function getChildCollections (klass) {
+  switch (klass) {
+    case 'canvas':
+      // contains graphics, groups, layers, lines, shapes, solids, subgraphs;
+      // children = ['layers', 'graphics', 'groups', 'lines', 'shapes', 'solids', 'subgraphs']
+      return ['layers']
+    case 'layer':
+    case 'sharedLayer':
+      return ['graphics', 'groups', 'lines', 'solids', 'shapes', 'subgraphs']
+    case 'group':
+    case 'subgraph': // a group
+    case 'table': // a group
+      return ['graphics', 'groups', 'solids', 'shapes', 'subgraphs']
+    case 'tableslice':
+    case 'row':
+    case 'column':
+      return ['graphics']
+    case 'graphic':
+      // contains incomingLines, lines, outgoingLines, userDataItems;
+      return ['incomingLines', 'lines', 'outgoingLines']
+    case 'incomingline':
+    case 'outgoingline':
+    case 'line':
+      return ['labels']
+    case 'shape':
+    case 'solid':
+    case 'label':
+
+      return []
+    default:
+      throw new Error(`ERROR unknown class: "${klass}"`)
+  }
 }
 
 function setParameters (argv) {
