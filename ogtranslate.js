@@ -125,8 +125,28 @@ function CommandExtractStrings (parameters) {
 }
 
 function CommandInjectStrings (parameters) {
+  // inject some text into all text elements (stub)
   this.finish = partial(console.log, 'finished')
+
   this.callback = function (item, context) {
+  // a callback for extracting strings into a TextRepository()
+
+    function itemHasText (item) {
+      return (TEXT_CONTAINERS.includes(item.class()))
+    }
+
+    if (itemHasText(item)) {
+      logger.info(`text: "${item.text()}"`)
+      logger.info(`ars: "${item.text.attributeRuns.length}"`)
+      // element has more than zero length accessible text
+      if (item.text.attributeRuns.length > 1) {
+        for (let idx = 0; idx <= item.text.attributeRuns.length; idx++) {
+          item.text.attributeRuns[idx].text.set('foobar')
+        }
+      } else {
+        item.text.set('foobar')
+      }
+    }
   }
 }
 
@@ -139,6 +159,7 @@ function CommandAnalyzeObjects (parameters) {
     writeTextToFile(texts.join(' '), file)
   }
   logger._logCallback = partial(logToFile, parameters.target)
+  logger.setLogThreshold(logger.DEBUG + 5)
 
   this.counter = new ClassCounter()
   this.countClasses = function (counter, item, context) {
