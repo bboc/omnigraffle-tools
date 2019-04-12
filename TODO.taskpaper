@@ -1,16 +1,9 @@
-create a separate Github Project:
-	- create & clone a new repo @done
-	- set up branches (develoment at least) and git flow @done
-	- make a project for Sublime Text with eslint etc. @done
-	- copy all JXA files from here to there @done
-	- remove JXA files from other repo @done
-	- copy all relevant documentation from ogtool repo @done
-	- move all JXA related info from this document to a separate readme-file (markdown!) @done
 known problems:
 	- can't access shared layers from JXA
-	- export is broken, OmniGroup support is investigatign this, might be related to shared layers problem
+	- export is broken, OmniGroup support is investigating this, might be related to shared layers problem
 	- accessing ids of items in the document (e.g. via doc.canvases[0].layers[0].graphics[0].id()) prevents the script from accessing all elements (need to raise this with OG support)
 		- raise id() problem with OmniGraffle support
+	- unclear if updating attribute runs in JXA is working
 ogexport (JXA):
 	- write a small parser for commandline arguments and store them in associative array @done
 	✔ finish basic export for PNG @done (19-03-15 11:39)
@@ -21,10 +14,38 @@ ogexport (JXA):
 		- create and open a copy of the document (otherwise OmniGraffle might change it)
 		- export just one canvas (by name)
 project setup:
-	- consider making this a proper npm project with browserify (otherwise continued development will become a horrible mid-nineties experience)
+	- consider making this a proper npm project with browserify (otherwise continued development will become a horrible mid-nineties experience) or node-jxa
 
 ogtranslate:
 	Consider a mix of JXA (for interaction with the OmniGraffle documents) and python (for preparing a JSON file and invoking the JXA script). Or make it a NPM project and use what's out there
+	- see if filtering described in https://developer.apple.com/library/archive/releasenotes/InterapplicationCommunication/RN-JavaScriptForAutomation/Articles/OSX10-10.html#//apple_ref/doc/uid/TP40014508-CH109-SW1 can get around travesing the document tree (no, it won't) @done
+	Strategy 1:
+		parse omnigraffle XML (plist file) and extract rich text to markdown (and back). 
+		Supported Markup:
+			(1) one text element contains only one font, and only standard formatting (bold, italics, links)
+			(2) handle Open Sans light and regular as normal/bold
+			(3*) figure out how OG encodes bullent points and process that accordingly 
+		Benefits:
+			works with Python, so development is pretty fast 
+			no bugs need to be solved in OmniGraffle
+		Challenges:
+			parsing RTF might be turn out to become interesting
+			how to find out which text goes where? (maybe copy file and replace text with ID??, set those in user data or something)
+		Estimate:
+			no idea, probably a couple of dayas
+			- proof of principle: extract all texts as RTF from test-data.graffle
+			- proof of principle: work with python rtf library and see how that goes
+	Strategy 2:
+		Write an OmniGraffle Plugin that extracts  the text without any formatting. That would work with 90% of the illustrations (but not with posters and primer)
+		Benefits:
+			simple
+		Challenges:
+			not all illustrations can be translated that way
+			scripting an omni graffle plugin from outside through script links is not very elegant
+		Estimate:
+			who knows?
+	- proof of principle: call plugin from outside (find plugin, execute action)
+	- proof of principle: plugin: dump all texts to file with the same name as the open document
 
 ogtools:
 	What I need mostly is changing colors (and fonts), but maybe it's the simplest way doing this and ogtranslate with a generic document parser and plugins??
