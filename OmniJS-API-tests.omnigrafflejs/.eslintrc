@@ -1,6 +1,0 @@
-{
-  "extends": "standard",
-  "rules": {
-    // Additional, per-project rules...
-  }
-}
