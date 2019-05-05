@@ -1,0 +1,13 @@
+{
+ "author": "YOU",
+ "identifier": "OmniJS-API-tests.bboc.OmniGraffle",
+ "version": "0.1",
+ "description": "Tests for the OmniJS API.",
+ "actions": [
+   {
+     "image": "king-of-dudes.jpg",
+     "identifier": "OmniJsApiTests"
+   }
+ ],
+ "defaultLocale": "en"
+}
