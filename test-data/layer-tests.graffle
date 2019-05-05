@@ -353,6 +353,8 @@
 					<string>ShapedGraphic</string>
 					<key>ID</key>
 					<integer>2</integer>
+					<key>Name</key>
+					<string>my circle</string>
 					<key>Shape</key>
 					<string>Circle</string>
 					<key>Style</key>
@@ -593,7 +595,7 @@
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2019-05-05 08:09:53 +0000</string>
+	<string>2019-05-05 08:21:42 +0000</string>
 	<key>Modifier</key>
 	<string>Bernhard Bockelbrink</string>
 	<key>MovementHandleVisible</key>
@@ -666,7 +668,7 @@
 			<key>BackgroundGraphic</key>
 			<dict>
 				<key>Bounds</key>
-				<string>{{-579, -536}, {2093, 1803}}</string>
+				<string>{{-259, -816}, {1171, 2643}}</string>
 				<key>Class</key>
 				<string>GraffleShapes.CanvasBackgroundGraphic</string>
 				<key>ID</key>
@@ -1365,7 +1367,7 @@
 			<key>BackgroundGraphic</key>
 			<dict>
 				<key>Bounds</key>
-				<string>{{-459, -532}, {2208, 1844}}</string>
+				<string>{{-139, -812}, {1568, 2643}}</string>
 				<key>Class</key>
 				<string>GraffleShapes.CanvasBackgroundGraphic</string>
 				<key>ID</key>
@@ -2501,9 +2503,9 @@ Line Label}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>2</integer>
+		<integer>0</integer>
 		<key>Frame</key>
-		<string>{{28, 47}, {1280, 777}}</string>
+		<string>{{960, -0}, {960, 1057}}</string>
 		<key>ShowInfo</key>
 		<true/>
 		<key>ShowRuler</key>
@@ -2515,7 +2517,7 @@ Line Label}</string>
 		<key>Sidebar_Tab</key>
 		<integer>0</integer>
 		<key>VisibleRegion</key>
-		<string>{{-325, 297}, {703, 617}}</string>
+		<string>{{124, 81}, {383, 897}}</string>
 		<key>WindowInfo_InspectorTab</key>
 		<array>
 			<string>com.omnigroup.OmniGraffle.inspectorGroup.document</string>
