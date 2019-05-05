@@ -1,0 +1,13 @@
+{
+ "author": "YOU",
+ "identifier": "layer-tests.bboc.OmniGraffle",
+ "version": "0.1",
+ "description": "Tests for known bugs.",
+ "actions": [
+   {
+     "image": "king-of-dudes.jpg",
+     "identifier": "runTests"
+   }
+ ],
+ "defaultLocale": "en"
+}
