@@ -19,11 +19,24 @@ var require = function (path) {
 }
 /* ---------- end standard require function ------------ */
 
-var [writeTextToFile, readFile] = require('./modules/file_io.js')
+//var [writeTextToFile, readFile] = require('./modules/file_io.js')
+
+fileIO = Library("files.js")
 
 function run (argv) { // eslint-disable-line no-unused-vars
-  var story = 'this is some text'
-  // var desktopString = app.pathTo("desktop").toString()
-  var file = argv[0]
-  writeTextToFile(story, file, true)
+  // var story = 'this is some text'
+  // // var desktopString = app.pathTo("desktop").toString()
+  // var file = argv[0]
+  // writeTextToFile(story, file, true)
+
+
+  ObjC.import('stdlib')
+  $.getenv('_') // This should always be '/usr/bin/osascript'
+
+  var env = $.NSProcessInfo.processInfo.environment // -[[NSProcessInfo processInfo] environment]
+  env = ObjC.unwrap(env)
+  for (var k in env) {
+      console.log('"' + k + '": ' + ObjC.unwrap(env[k]))
+  }
+
 }
