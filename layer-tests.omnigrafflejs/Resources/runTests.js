@@ -50,6 +50,8 @@ var _ = (function () {
     var cnvs1 = document.canvasByName('Canvas 1')
     var notShared = cnvs1.layerByName('not-shared')
     var shared = cnvs1.layerByName('shared')
+    var cnvs3 = document.canvasByName('translatable')
+    var content = document.canvasByName('translatable').layerByName('content')
     console.clear()
 
     function testBasics () {
@@ -63,15 +65,15 @@ var _ = (function () {
       assertEqual(shared.graphics.length, 1, 'check  element count in shared layer')
     }
 
-    function testGraphicsWithName () {
-      console.log('--- test accessing graphics via index and via canvas.graphicsWithName()')
+    function testGraphicWithName () {
+      console.log('--- test accessing graphics via index and via canvas.graphicWithName()')
       assertClass(notShared.graphics[0], 'Shape', 'not-shared.0 should be a shape')
       assertClass(notShared.graphics[1], 'Shape', 'not-shared.1 should be a shape')
 
       var ncName = 'normal-circle'
-      assertClass(cnvs1.graphicWithName(ncName), 'Shape', 'access of normal-circle via graphicsWithName()')
-      assertEqual(cnvs1.graphicWithName(ncName).name, ncName, 'access name of normal-circle via graphicsWithName()')
-      assertEqual(cnvs1.graphicWithName(ncName).text, 'Text in normal-circle', 'access text of normal-circle via graphicsWithName()')
+      assertClass(cnvs1.graphicWithName(ncName), 'Shape', 'access of normal-circle via graphicWithName()')
+      assertEqual(cnvs1.graphicWithName(ncName).name, ncName, 'access name of normal-circle via graphicWithName()')
+      assertEqual(cnvs1.graphicWithName(ncName).text, 'Text in normal-circle', 'access text of normal-circle via graphicWithName()')
     }
 
     function testSharedLayerAccess () {
@@ -81,43 +83,51 @@ var _ = (function () {
       assertEqual(shared.graphics[0].name, scName, 'access of shared.0.name via index')
       assertEqual(shared.graphics[0].text, 'Text on a shared layer', 'access shared.0.text via index')
 
-      assertClass(cnvs1.graphicWithName(scName), 'Shape', 'access of shared-circle via graphicsWithName()')
-      assertEqual(cnvs1.graphicWithName(scName).name, scName, 'access name of shared-circle via graphicsWithName()')
-      assertEqual(cnvs1.graphicWithName(scName).text, 'Text on a shared layer', 'access text of shared-circle via graphicsWithName()')
+      assertClass(cnvs1.graphicWithName(scName), 'Shape', 'access of shared-circle via graphicWithName()')
+      assertEqual(cnvs1.graphicWithName(scName).name, scName, 'access name of shared-circle via graphicWithName()')
+      assertEqual(cnvs1.graphicWithName(scName).text, 'Text on a shared layer', 'access text of shared-circle via graphicWithName()')
     }
 
-    function testElementAccessBug () {
-      console.log('--- known bug: accessing an element in a shared layer after attempting to access an element that does not exist in that layer:')
-      assertEqual(shared.graphics[0].text, 'Text on a shared layer', 'retrieve text from shared.0')
-      var idx = shared.graphics.length + 1
-      assertType(shared.graphics[idx], 'undefined', 'this element should not exist')
-      assertEqual(shared.graphics[idx].text, '', 'undefined object should return no text')
-      assertEqual(shared.graphics[0].text, 'Text on a shared layer', 'text in shared.0 is still accessible')
+    function testGroupText () {
+      console.log('--- items in groups should return text data')
+
+      var name = 'my-group'
+      assertClass(cnvs3.graphicWithName(name), 'Group', 'it\'s a group')
+      assertEqual(cnvs3.graphicWithName(name).name, name, '...with the correct name')
+      assertEqual(cnvs3.graphicWithName(name).graphics[0].name, 'r1', '.. which contains a child')
+      assertEqual(cnvs3.graphicWithName(name).graphics[0].text, 'Another Box inside a group', '.. and we can access the child\'s text')
     }
 
-    function testSubgraphTextBug () {
-      console.log('--- known Bug: subgraphs return no text data')
-      fail('test not implemented')
+    function testSubgraphText () {
+      console.log('--- items in subgraphs should return text data')
+
+      var name = 'my-subgraph'
+      assertClass(cnvs3.graphicWithName(name), 'Subgraph', 'it\'s a subgraph')
+      assertEqual(cnvs3.graphicWithName(name).name, name, '...with the correct name')
+      assertEqual(cnvs3.graphicWithName(name).graphics[0].name, 's-r1', '.. which contains a child')
+      // weird: objects in subgraphs can be accessed with both graphics and subgraphics arrays ??!!
+      assertEqual(cnvs3.graphicWithName(name).subgraphics[0].text, 'Subgraph box b', '.. and we can access the child\'s text')
     }
 
-    function testGroupTextBug () {
-      console.log('--- known Bug: groups return no text data')
-      fail('test not implemented')
-    }
+    function testTableText () {
+      console.log('--- items in tables should return text data')
 
-    function testTableTextBug () {
-      console.log('--- known Bug: tables return no text data')
-      fail('test not implemented')
+      var name = 'my-table'
+      assertClass(cnvs3.graphicWithName(name), 'Table', 'it\'s a table')
+      assertEqual(cnvs3.graphicWithName(name).name, name, '...with the correct name')
+      var item = cnvs3.graphicWithName(name).graphicAt(1, 1)
+
+      assertEqual(item.name, 'cell-1-1', '.. which contains a child')
+      assertEqual(item.text, '2.2', '.. and we can access the child\'s text')
     }
     /// run the test suite
 
-    //testBasics()
-    //testGraphicsWithName()
+    testBasics()
+    testGraphicWithName()
     testSharedLayerAccess()
-    // testElementAccessBug()
-    // testSubgraphTextBug()
-    // testGroupTextBug()
-    // testTableTextBug()
+    testGroupText()
+    testSubgraphText()
+    testTableText()
 
     // end of tests
     console.info(`--- test finished, ${failedTests} tests failed.`)

@@ -595,7 +595,7 @@
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2019-05-05 12:23:40 +0000</string>
+	<string>2019-05-05 13:17:42 +0000</string>
 	<key>Modifier</key>
 	<string>Bernhard Bockelbrink</string>
 	<key>MovementHandleVisible</key>
@@ -655,7 +655,7 @@
 	<array>
 		<dict>
 			<key>ActiveLayerIndex</key>
-			<integer>0</integer>
+			<integer>1</integer>
 			<key>AllLayers</key>
 			<array>
 				<string>not-shared</string>
@@ -1061,7 +1061,7 @@
 			<key>BackgroundGraphic</key>
 			<dict>
 				<key>Bounds</key>
-				<string>{{-1150, -762}, {3806, 2481}}</string>
+				<string>{{-579, -536}, {2093, 1803}}</string>
 				<key>Class</key>
 				<string>GraffleShapes.CanvasBackgroundGraphic</string>
 				<key>ID</key>
@@ -1396,7 +1396,7 @@
 			<key>BackgroundGraphic</key>
 			<dict>
 				<key>Bounds</key>
-				<string>{{-139, -812}, {1568, 2643}}</string>
+				<string>{{-459, -532}, {2208, 1844}}</string>
 				<key>Class</key>
 				<string>GraffleShapes.CanvasBackgroundGraphic</string>
 				<key>ID</key>
@@ -1453,7 +1453,7 @@
 							<key>ID</key>
 							<integer>20</integer>
 							<key>Name</key>
-							<string>Rectangle 1</string>
+							<string>s-r1</string>
 							<key>Style</key>
 							<dict>
 								<key>shadow</key>
@@ -1551,7 +1551,7 @@
 						<real>9</real>
 					</array>
 					<key>Name</key>
-					<string>subgraph</string>
+					<string>my-subgraph</string>
 					<key>Style</key>
 					<dict>
 						<key>fill</key>
@@ -1585,6 +1585,8 @@
 							<string>ShapedGraphic</string>
 							<key>ID</key>
 							<integer>17</integer>
+							<key>Name</key>
+							<string>r1</string>
 							<key>Style</key>
 							<dict>
 								<key>shadow</key>
@@ -1614,6 +1616,8 @@
 							<string>ShapedGraphic</string>
 							<key>ID</key>
 							<integer>16</integer>
+							<key>Name</key>
+							<string>r2</string>
 							<key>Style</key>
 							<dict>
 								<key>shadow</key>
@@ -1640,7 +1644,7 @@
 					<key>ID</key>
 					<integer>18</integer>
 					<key>Name</key>
-					<string>group</string>
+					<string>my-group</string>
 					<key>Style</key>
 					<dict>
 						<key>fill</key>
@@ -1676,6 +1680,8 @@
 							<string>Resize</string>
 							<key>ID</key>
 							<integer>9</integer>
+							<key>Name</key>
+							<string>a-cell</string>
 							<key>Style</key>
 							<dict>
 								<key>fill</key>
@@ -1811,6 +1817,8 @@
 							<string>Resize</string>
 							<key>ID</key>
 							<integer>13</integer>
+							<key>Name</key>
+							<string>cell-1-1</string>
 							<key>Style</key>
 							<dict>
 								<key>fill</key>
@@ -1969,7 +1977,7 @@
 					<key>ID</key>
 					<integer>10</integer>
 					<key>Name</key>
-					<string>table</string>
+					<string>my-table</string>
 					<key>Style</key>
 					<dict>
 						<key>fill</key>
@@ -1996,6 +2004,8 @@
 					<string>ShapedGraphic</string>
 					<key>ID</key>
 					<integer>7</integer>
+					<key>Name</key>
+					<string>my-rectangle</string>
 					<key>Style</key>
 					<dict>
 						<key>shadow</key>
@@ -2532,7 +2542,7 @@ Line Label}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>0</integer>
+		<integer>2</integer>
 		<key>Frame</key>
 		<string>{{640, 280}, {1280, 777}}</string>
 		<key>ShowInfo</key>
@@ -2546,7 +2556,7 @@ Line Label}</string>
 		<key>Sidebar_Tab</key>
 		<integer>0</integer>
 		<key>VisibleRegion</key>
-		<string>{{124, 81}, {703, 617}}</string>
+		<string>{{200, 107}, {703, 617}}</string>
 		<key>WindowInfo_InspectorTab</key>
 		<array>
 			<string>com.omnigroup.OmniGraffle.inspectorGroup.object</string>
