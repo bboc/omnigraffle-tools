@@ -18,14 +18,21 @@ rtf_pattern = re.compile(dedent(r'''
 
 bold_pattern = re.compile(r'\\b\s+(?P<styled_text>.+?)\s+\\b0', re.DOTALL)
 italic_pattern = re.compile(r'\\i\s+(?P<styled_text>.+?)\s+\\i0', re.DOTALL)
+
+linebreaks_pattern = re.compile(r'(\\)\n', re.DOTALL)
+
+
+# TODO: \\\n marks a line break in rtf all others can go
 newline_in_sentences = re.compile(r'(?P<char>\w)\n')
+# TODO: all double whitespace afte the first word character should go
 double_space_before_word = re.compile(r'\s\s(?P<char>\w)')
 double_space_after_word = re.compile(r'(?P<char>\w)\s\s')
 
 replacements = (
 
     (bold_pattern, '**\g<styled_text>**'),
-    (italic_pattern, '**\g<styled_text>**'),
+    (italic_pattern, '_\g<styled_text>_'),
+    (linebreaks_pattern, '\n'),
     (newline_in_sentences, '\g<char> '),
     (double_space_before_word, ' \g<char>'),
     (double_space_after_word, '\g<char> '),
@@ -33,7 +40,6 @@ replacements = (
 
 
 def rtf2md(text):
-
     m = rtf_pattern.match(text.strip())
     if m is None:
         raise Exception("no content found %s" % text)
@@ -98,7 +104,7 @@ class BasicTests(unittest.TestCase):
             \i italic
             \i0  text}
         """)
-        self.assertEqual(rtf2md(text), "This is some **italic** text")
+        self.assertEqual(rtf2md(text), "This is some _italic_ text")
 
 
 class MoreTests(unittest.TestCase):
@@ -107,7 +113,8 @@ class MoreTests(unittest.TestCase):
         """
         …
         """
-        text = dedent(r"""{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
+        text = dedent(r"""
+            {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
             {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
             {\colortbl;\red255\green255\blue255;}
             {\*\expandedcolortbl;;}
@@ -120,14 +127,17 @@ class MoreTests(unittest.TestCase):
             \i0  text.\
             And a second paragraph}""")
 
-        expected = 'foo'
+        expected = dedent("""\
+            Box with some **bold** and some _italic_ text.
+            And a second paragraph""")
         self.assertEqual(rtf2md(text), expected)
 
     def test_list_markup(self):
         """
         …
         """
-        text = dedent(r"""{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
+        text = dedent(r"""
+            {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
             {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 LucidaGrande;}
             {\colortbl;\red255\green255\blue255;}
             {\*\expandedcolortbl;;}
