@@ -55,5 +55,6 @@ Sandboxing:
 	- get rid of the error that does not allow opening of files from scripts (wrap filenames in Path()
 Workng with RTF:
 	- use PyRTF?? (examples: https://github.com/grangier/pyrtf/blob/master/examples/examples.py)
+	- convert via textutil? https://ss64.com/osx/textutil.html
 	- try textract https://textract.readthedocs.io/en/stable/
 
