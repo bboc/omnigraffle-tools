@@ -21,7 +21,6 @@ italic_pattern = re.compile(r'\\i\s+(?P<styled_text>.+?)\s+\\i0', re.DOTALL)
 
 linebreaks_pattern = re.compile(r'(\\)\n', re.DOTALL)
 
-
 # TODO: \\\n marks a line break in rtf all others can go
 newline_in_sentences = re.compile(r'(?P<char>\w)\n')
 # TODO: all double whitespace afte the first word character should go
@@ -31,9 +30,9 @@ double_space_after_word = re.compile(r'(?P<char>\w)\s\s')
 replacements = (
 
     (bold_pattern, '**\g<styled_text>**'),
+    (newline_in_sentences, '\g<char> '),
     (italic_pattern, '_\g<styled_text>_'),
     (linebreaks_pattern, '\n'),
-    (newline_in_sentences, '\g<char> '),
     (double_space_before_word, ' \g<char>'),
     (double_space_after_word, '\g<char> '),
 )
@@ -51,13 +50,8 @@ def rtf2md(text):
 
 
 class BasicTests(unittest.TestCase):
-    """
-    parse a pretty simple example
-    """
     def test_plain_text(self):
-        """
-        Plain text should be extracted.
-        """
+        """Plain text should be extracted correctly."""
         text = dedent(r"""
             {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
             {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
@@ -71,10 +65,7 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(rtf2md(text), expected)
 
     def test_bold_text(self):
-        """
-        A some simple bold text should be converted to Markdown.
-        """
-
+        """A some simple bold text should be converted to Markdown."""
         text = dedent(r"""
             {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
             {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
@@ -89,10 +80,7 @@ class BasicTests(unittest.TestCase):
         self.assertEqual(rtf2md(text), "This is some **bold** text")
 
     def test_italic_text(self):
-        """
-        A some simple bold text should be converted to Markdown.
-        """
-
+        """A some simple italic text should be converted to Markdown."""
         text = dedent(r"""
             {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
             {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
@@ -110,9 +98,7 @@ class BasicTests(unittest.TestCase):
 class MoreTests(unittest.TestCase):
 
     def test_combined_markup(self):
-        """
-        …
-        """
+        """Italics and bold at the same time are properly processed."""
         text = dedent(r"""
             {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
             {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
@@ -155,7 +141,6 @@ class MoreTests(unittest.TestCase):
 
         expected = 'foo'
         self.assertEqual(rtf2md(text), expected)
-
 
 
 if __name__ == "__main__":
