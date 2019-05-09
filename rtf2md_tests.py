@@ -16,14 +16,16 @@ rtf_pattern = re.compile(dedent(r'''
     \\f0\\fs32 \\cf0 (?P<contents>.+)\}''').strip(), re.DOTALL)
 
 
-bold_pattern = re.compile(r'\\b\s+(?P<bold_text>.+?)\s+\\b0', re.DOTALL)
+bold_pattern = re.compile(r'\\b\s+(?P<styled_text>.+?)\s+\\b0', re.DOTALL)
+italic_pattern = re.compile(r'\\i\s+(?P<styled_text>.+?)\s+\\i0', re.DOTALL)
 newline_in_sentences = re.compile(r'(?P<char>\w)\n')
 double_space_before_word = re.compile(r'\s\s(?P<char>\w)')
 double_space_after_word = re.compile(r'(?P<char>\w)\s\s')
 
 replacements = (
 
-    (bold_pattern, '**\g<bold_text>**'),
+    (bold_pattern, '**\g<styled_text>**'),
+    (italic_pattern, '**\g<styled_text>**'),
     (newline_in_sentences, '\g<char> '),
     (double_space_before_word, ' \g<char>'),
     (double_space_after_word, '\g<char> '),
@@ -50,7 +52,8 @@ class BasicTests(unittest.TestCase):
         """
         Plain text should be extracted.
         """
-        text = dedent(r"""{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
+        text = dedent(r"""
+            {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
             {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
             {\colortbl;\red255\green255\blue255;}
             {\*\expandedcolortbl;;}
@@ -60,7 +63,6 @@ class BasicTests(unittest.TestCase):
 
         expected = 'some plain text'
         self.assertEqual(rtf2md(text), expected)
-
 
     def test_bold_text(self):
         """
@@ -79,7 +81,6 @@ class BasicTests(unittest.TestCase):
             \b0  text}
         """)
         self.assertEqual(rtf2md(text), "This is some **bold** text")
-
 
     def test_italic_text(self):
         """
