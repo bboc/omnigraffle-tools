@@ -2,20 +2,31 @@
 
 
 def extract_text_from_rtf(element):
+    raw_rtf = element[1].text
+
+
+def print_unitest(element):
     """extract marked up text from rtf."""
 
     raw_rtf = element[1].text
-    print('text = dedent("""')
-    print(raw_rtf)
-    print('""")')
+    print('''
+        def test_something(self):
+            """
+            …
+            """
+            text = dedent("""%(raw_rtf)s""")
+
+            expected = 'foo'
+            self.assertEqual(rtf2md(text), expected)
+
+    ''' % dict(raw_rtf=raw_rtf))
 
 
 if __name__ == "__main__":
 
     import xml.etree.ElementTree as ET
-    tree = ET.parse('test-data/first-rtf-test.graffle/data.plist')
+    tree = ET.parse('test-data/test-data-file-package.graffle/data.plist')
     root = tree.getroot()
-
 
     for element in root.findall(".//dict//key/.."):
         if element[0].text == "Text":
