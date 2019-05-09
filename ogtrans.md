@@ -4,9 +4,20 @@ Right now that is relevant for Hebrew, Dutch and Russian translations of the S3 
 
 ## How to store and retrieve translations
 
+Notes: Crowdin treats each multiline string in a POT file as one single string, i.e. all small changes require a full re-translation. Also there's no support for Markdown, so that translators have to take care to write correct Markdown. For HTML tags there's at least a way to copy them from source to translation
+
 ### Open Questions
 
 How can I store Markdown and multiline content in PO files, and how will Crowdin handle that?
+
+#### Example Text
+
+This is a paragraph of text, with some **bold** and some _italic_ text. Also there's a list with two elements:
+
+- one list item
+- another list item
+
+After the list, there's another sentence for good measure, complete with a **bold part**.
 
 ### Approach 1: Translation Memory
 

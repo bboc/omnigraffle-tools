@@ -1,0 +1,59 @@
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: sociocracy-30-illustrations\n"
+"X-Crowdin-Language: de\n"
+"X-Crowdin-File: /test/test.pot\n"
+"Project-Id-Version: sociocracy-30-illustrations\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Last-Translator: sociocracy30\n"
+"Language-Team: German\n"
+"Language: de_DE\n"
+"PO-Revision-Date: 2019-05-09 20:53\n"
+
+#: agreements.graffle/consent-decision-making:0
+msgid "Celebrate Agreement"
+msgstr "Erfolg feiern!"
+
+#: simple markdown test
+msgid "This is a line of text, with some **bold** and some _italic_ text."
+msgstr "Dies ist ein Absatz mit etwas **fettem** und ein wenig _kursivem_ Text."
+
+#: full multiline markdown test
+msgid "This is a paragraph of text, with some **bold** and some _italic_ text. Also there's a list with two elements: \n"
+" \n"
+"- one list item \n"
+"- another list item \n"
+" \n"
+"After the list, there's another sentence for good measure, complete with a **bold part**. \n"
+msgstr "Dies ist ein Absatz mit etwas **fettem** und ein wenig _kursivem_ Text. Außerdem gibt's eine Liste mit zwei Elementen: \n"
+" \n"
+"- das erste Listenelement\n"
+"- noch ein Listenelement\n"
+" \n"
+"Und nach der Liste gibt es noch einen Satz, der auch wieder einen **fetten** Teil hat.\n"
+
+#: agreements.graffle/evaluate-agreements:0
+msgid "keep \n"
+"agreement"
+msgstr "Vereinbarung beibehalten"
+
+#: agreements.graffle/resolve-objections:0
+msgid "timeboxed dialogue \n"
+"(2 or 3 people)"
+msgstr "Dialog (Timebox!)"
+
+#: agreements.graffle/resolve-objections:0
+msgid "ask member\n"
+" with objection \n"
+"to amend proposal"
+msgstr "Einwandgeber\n"
+"schlägt eine \n"
+"Änderung vor"
+
+#: agreements.graffle/resolve-objections:0
+msgid "Pick the most promising option \n"
+"(repeat until resolved)"
+msgstr "Integriere einen Einwand nach dem anderen. Überlege, welche der Ideen hier für den aktuellen Einwand am Besten helfen könnte:"
+
