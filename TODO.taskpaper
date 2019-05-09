@@ -33,7 +33,7 @@ ogtranslate:
 			how to find out which text goes where? (maybe copy file and replace text with ID??, set those in user data or something)
 		Estimate:
 			no idea, probably a couple of dayas
-			- proof of principle: extract all texts as RTF from test-data.graffle
+			- proof of principle: extract all texts as RTF from test-data.graffle @done(19-05-09)
 			- proof of principle: work with python rtf library and see how that goes
 	Strategy 2:
 		Write an OmniGraffle Plugin that extracts  the text without any formatting. That would work with 90% of the illustrations (but not with posters and primer)
@@ -52,5 +52,8 @@ ogtools:
 
 Sandboxing:
 	https://developer.apple.com/library/archive/qa/qa1888/_index.html#//apple_ref/doc/uid/DTS40015156
-	- get rid of the error that does not allow opening of files from scripts
+	- get rid of the error that does not allow opening of files from scripts (wrap filenames in Path()
+Workng with RTF:
+	- use PyRTF?? (examples: https://github.com/grangier/pyrtf/blob/master/examples/examples.py)
+	- try textract https://textract.readthedocs.io/en/stable/
 
