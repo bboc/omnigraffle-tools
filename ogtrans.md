@@ -105,5 +105,33 @@ Write an OmniGraffle Plugin that extracts the text without any formatting. That 
 -   might require some retouching of the illustrations
 
 **Estimate:** Who knows? Not important right now
-	
+
+## plist Structure
+
+Plist as XML is such a massively bad idea. Why create something that looks like XML, but cannot make use of all the tools XML provides navigate complexity: XPATH and XSLT. And why on earth is RTF in an XML document, when HTML is a much more logical and equally powerful choice?
+
+	<dict>
+		…	
+		<key>Class</key>
+		<string>ShapedGraphic</string>
+		<key>ID</key>
+		<integer>7</integer>
+		<key>Name</key>
+		<string>foo</string>
+		…
+		<key>Text</key>
+		<dict>
+			<key>Text</key>
+			<string>{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
+				…
+				}</string>
+			<key>TextAlongPathGlyphAnchor</key>
+			<string>center</string>
+		</dict>
+		<key>UserInfo</key>
+		<dict>
+			<key>filename</key>
+			<string>textbox-a</string>
+		</dict>
+	</dict>
 	
