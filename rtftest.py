@@ -4,11 +4,25 @@
 import argparse
 from lxml import etree as ET
 from rtf2md_tests import rtf2md
+from textwrap import dedent
+
+substitute = dedent(r"""{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc\partightenfactor0
+    
+\f0\fs32 \cf0 Replaced text}""")
+
+
+def replace_text_in_element(element):
+    element[1].text = substitute
 
 
 def dump_element(element):
     raw_rtf = element[1].text
     print('-' * 30)
+    print(raw_rtf)
     try:
         print(rtf2md(raw_rtf))
     except:
@@ -58,6 +72,18 @@ def cmd_dump(args):
             dump_element(element)
 
 
+def cmd_replace(args):
+    print("test: replace text and write back ")
+
+    tree = ET.parse(args.document)
+    root = tree.getroot()
+
+    for element in root.findall(".//dict//key/.."):
+        if element[0].text == "Text":
+            replace_text_in_element(element)
+    tree.write('output.graffle', encoding="UTF-8", xml_declaration=True)
+
+
 if __name__ == "__main__":
 
     # create the top-level parser
@@ -74,6 +100,9 @@ if __name__ == "__main__":
 
     p_dump = subparsers.add_parser('dump', help='dump text into OmniGraffle document')
     p_dump.set_defaults(func=cmd_dump)
+
+    p_replace = subparsers.add_parser('replace', help='replace text and write back')
+    p_replace.set_defaults(func=cmd_replace)
 
     args = parser.parse_args()
     args.func(args)
