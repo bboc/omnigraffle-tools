@@ -84,7 +84,7 @@ def cmd_replace(args):
     tree.write('output.graffle', encoding="UTF-8", xml_declaration=True)
 
 
-if __name__ == "__main__":
+def main():
 
     # create the top-level parser
     parser = argparse.ArgumentParser(prog='ogtranslate')
