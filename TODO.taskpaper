@@ -1,10 +1,12 @@
 ogtranslate:
-	see ./orgtrans.md for documentation
+	see ./ogrtrans/README.md for documentation
 	Preparation:
 		- clean up the documentation about ogtrans @estimate(30min) @done
-		- test if PO files containing MD can be properly translated in crowdin
-		- decide on how to save files, and how translations will be injected @estimate(1h)
-		- write a simple command that dumps contents of a full file as markdown @estimate(30min)
+		- test if PO files containing MD can be properly translated in crowdin @done
+		- decide on how to save files, and how translations will be injected @estimate(1h) @done
+		- write a simple command that dumps contents of a full file as markdown @estimate(30min) @done
+	Cleanup:
+		- create a proper python package for ogtrans @estimate(1h)
 	rtf2md:
 		- pick up all the usecases in the illustrations that are currently not supported @estimate(1h)
 		- fix all the usecases in the rtf2markdown converter @estimate(4h)
