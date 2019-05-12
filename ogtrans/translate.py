@@ -3,6 +3,7 @@
 import argparse
 from lxml import etree as ET
 from textwrap import dedent
+import plistlib
 
 from .rtf2md import rtf2md
 
@@ -62,14 +63,25 @@ def cmd_inject(args):
 def cmd_dump(args):
     print("dump text")
 
-    tree = ET.parse(args.document)
-    root = tree.getroot()
+    fp = open(args.document, 'rb')
+    doc = plistlib.load(fp, fmt=plistlib.FMT_XML)
+    walk_plist(doc)
 
-    for element in root.findall(".//dict//key/.."):
-        # get all dicts where the text of the first elementsi "Text"
-        # TODO: this is probably not very robust
-        if element[0].text == "Text":
-            dump_element(element)
+
+def walk_plist(root, indent=0):
+    if type(root) == list:
+        for item in root:
+            walk_plist(item, indent+1)
+    elif type(root) == dict:
+        for key, contents in root.items():
+            print(indent*'  ', key)
+            walk_plist(contents, indent+1) 
+    else:
+        if type(root) == bytes:
+            print(indent*'  ', type(root), '…')
+        else:
+            print(indent*'  ', type(root), root)
+
 
 
 def cmd_replace(args):
