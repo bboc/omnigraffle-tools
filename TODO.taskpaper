@@ -6,8 +6,9 @@ ogtranslate:
 		- decide on how to save files, and how translations will be injected @estimate(1h) @done
 		- write a simple command that dumps contents of a full file as markdown @estimate(30min) @done
 	Cleanup:
-		- create a proper python package for ogtrans @estimate(1h)
+		- create a proper python package for ogtrans @estimate(1h) @done
 	rtf2md:
+		- write a more robust extractor for RTF that better identifies the actual text
 		- pick up all the usecases in the illustrations that are currently not supported @estimate(1h)
 		- fix all the usecases in the rtf2markdown converter @estimate(4h)
 	Translation workflow:
@@ -26,21 +27,23 @@ ogexport (JXA):
 	- makefile: link ogexport script to /usr/local/bin/ogexport
 	- save and restore current export settings if necessary
 	- check old python code for additional behaviour and extend list of additional features
+	- introduce delay before closing documents as workaround for export bug
+	Sandboxing:
+		https://developer.apple.com/library/archive/qa/qa1888/_index.html#//apple_ref/doc/uid/DTS40015156
+		- get rid of the error that does not allow opening of files from scripts by wrapping filenames in Path()
 	additional features:
 		- create and open a copy of the document (otherwise OmniGraffle might change it)
 		- export just one canvas (by name)
 
-known problems:
-	- can't access shared layers from JXA
-	- export is broken, OmniGroup support is investigating this, might be related to shared layers problem
-	- accessing ids of items in the document (e.g. via doc.canvases[0].layers[0].graphics[0].id()) prevents the script from accessing all elements (need to raise this with OG support)
-		- raise id() problem with OmniGraffle support
-	- unclear if updating attribute runs in JXA is working
-project setup:
-	- consider making this a proper npm project with browserify (otherwise continued development will become a horrible mid-nineties experience) or node-jxa
-ogtools:
-	What I need mostly is changing colors (and fonts), but maybe it's the simplest way doing this and ogtranslate with a generic document parser and plugins??
-Sandboxing:
-	https://developer.apple.com/library/archive/qa/qa1888/_index.html#//apple_ref/doc/uid/DTS40015156
-	- get rid of the error that does not allow opening of files from scripts (wrap filenames in Path()
+other tools: @later
+	known problems:
+		- can't access shared layers from JXA (is being fixed)
+		- export is broken, OmniGroup support is investigating this (being fixed)
+		- accessing ids of items in the document (e.g. via doc.canvases[0].layers[0].graphics[0].id()) prevents the script from accessing all elements (need to raise this with OG support)
+			- raise id() problem with OmniGraffle support
+		- unclear if updating attribute runs in JXA is working
+	proj§ect setup:
+		- consider making this a proper npm project with browserify (otherwise continued development will become a horrible mid-nineties experience) or node-jxa
+	ogtools:
+		What I need mostly is changing colors (and fonts), but maybe it's the simplest way doing this and ogtranslate with a generic document parser and plugins??
 
