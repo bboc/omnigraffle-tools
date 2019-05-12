@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
-
 import argparse
 from lxml import etree as ET
-from rtf2md_tests import rtf2md
 from textwrap import dedent
+
+from .rtf2md import rtf2md
 
 substitute = dedent(r"""{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
 {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
 {\colortbl;\red255\green255\blue255;}
 {\*\expandedcolortbl;;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc\partightenfactor0
-    
+
 \f0\fs32 \cf0 Replaced text}""")
 
 
@@ -106,3 +106,7 @@ def main():
 
     args = parser.parse_args()
     args.func(args)
+
+
+if __name__ == "__main__":
+    main()
