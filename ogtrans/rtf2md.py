@@ -1,14 +1,6 @@
 
 import re
 
-"""
-TODO: check other bullet types
-TODO: nested lists??
-TODO: special characters (like  ➤)
-TODO: encode/decode unicode characters
-TODO: bold/regular/italics using OpenSans
-"""
-
 bold_pattern = re.compile(r'\\b\s+(?P<styled_text>.+?)\s+\\b0', re.DOTALL)
 italic_pattern = re.compile(r'\\i\s+(?P<styled_text>.+?)\s+\\i0', re.DOTALL)
 

@@ -8,17 +8,22 @@ ogtranslate:
 	Cleanup:
 		- create a proper python package for ogtrans @estimate(1h) @done
 	rtf2md:
-		- can't find all text through XML, test plist parser
-		- write a more robust extractor for RTF that better identifies the actual text
-		- pick up all the usecases in the illustrations that are currently not supported @estimate(1h)
-		- fix all the usecases in the rtf2markdown converter @estimate(4h)
+		- can't find all text through XML, test plist parser @done
+		- write a more robust extractor for RTF that better identifies the actual text @done
+		- pick up all the usecases in the illustrations that are currently not supported @estimate(1h) @later
+		- fix all the usecases in the rtf2markdown converter @estimate(4h) @later
+		- check other bullet types @later
+		- check for nested lists?? @later
+		- process special characters (like  ➤) @later
+		- encode/decode unicode characters @later
+		- bold/regular/italics using OpenSans @later
 	Translation workflow:
-		- extract filename form user data
-		- add markdown to translation memory
-		- dump markdown to file if filename is present
+		- extract filename form user data @na
+		- add markdown to translation memory @na
+		- dump markdown to file if filename is present @na
 		- set fixed length if present in userdata (see if that is possible in PO files!!)
 		- create meaningful context information
-
+	
 	Implementation for Illustration:
 	- implement extractor @estimate(4h)
 	- implement injector @estimate(4h)
