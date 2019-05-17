@@ -7,6 +7,8 @@ import plistlib
 
 from .rtf2md import rtf2md
 
+
+
 substitute = dedent(r"""{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
 {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
 {\colortbl;\red255\green255\blue255;}
@@ -68,20 +70,32 @@ def cmd_dump(args):
     walk_plist(doc)
 
 
-def walk_plist(root, indent=0):
+def walk_plist(root, indent=0, path='/'):
+    def tabbed(*args):
+        print(indent * '  ', *args)
+
     if type(root) == list:
-        for item in root:
-            walk_plist(item, indent+1)
+        tabbed('[')
+        for idx, item in enumerate(root):
+            walk_plist(item, indent + 1, '%s[%s]' % (path, idx))
+        tabbed(']')
     elif type(root) == dict:
+        tabbed('{')
         for key, contents in root.items():
-            print(indent*'  ', key)
-            walk_plist(contents, indent+1) 
+            tabbed(key)
+            walk_plist(contents, indent + 1, '%s{%s}' % (path, key))
+        tabbed('}')
     else:
         if type(root) == bytes:
-            print(indent*'  ', type(root), '…')
+            tabbed(type(root), '…')
+        elif type(root) == str:
+            if root.startswith(r'{\rtf'):
+                tabbed(type(root), 'RTF-TEXT')
+                print(path)
+            else:
+                tabbed(type(root), root)
         else:
-            print(indent*'  ', type(root), root)
-
+            tabbed(type(root), root)
 
 
 def cmd_replace(args):
@@ -94,6 +108,12 @@ def cmd_replace(args):
         if element[0].text == "Text":
             replace_text_in_element(element)
     tree.write('output.graffle', encoding="UTF-8", xml_declaration=True)
+
+
+class PlistWalker(object):
+
+    def __init__(self, filename):
+        pass
 
 
 def main():
