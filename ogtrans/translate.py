@@ -56,7 +56,8 @@ def print_unitest(element):
 
 def cmd_extract(args):
     print("extract - text")
-    pw = PlistWalker(args.document, verbose=True)
+    pw = PlistTextExtractor(args.document)
+    pw.process()
 
 
 def cmd_inject(args):
@@ -115,8 +116,6 @@ class PlistWalker(object):
             tabbed(']')
         elif type(current) == dict:
             tabbed('%s {' % name)
-            if 'Class' in current:
-                tabbed('class', current['Class'])
             for key, item in current.items():
                 self._path.append('.%s' % key)
                 self.walk_plist(item, level + 1, key)
@@ -138,7 +137,42 @@ class PlistWalker(object):
 
 
 class PlistTextExtractor(PlistWalker):
-    pass
+
+    GRAPHICS_CLASSES = [
+        # 'Group',
+        'LineGraphic',
+        'ShapedGraphic',
+        # 'TableGroup',
+    ]
+
+    def __init__(self, filename):
+        self.text_containers = []
+        super().__init__(filename)
+
+    def selector(self, current):
+        if self.is_text_container(current) and self.has_text(current):
+            self.text_containers.append(current)
+
+    def is_text_container(self, current):
+        return type(current) == dict and 'Class' in current and current['Class'] in self.GRAPHICS_CLASSES
+
+    def has_text(self, current):
+
+        try:
+            text = current['Text']['Text']
+        except KeyError:
+            return False
+
+        if text.startswith(r'{\rtf'):
+            return True
+        else:
+            return False
+
+    def process(self):
+        for item in self.text_containers:
+            print('-' * 30)
+            print(item['Class'])
+            print(item['Text']['Text'])
 
 
 def main():
