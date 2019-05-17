@@ -61,9 +61,10 @@ class MoreTests(unittest.TestCase):
             {\listtext
             \f1 \uc0\u9642
             \f0     }and another one\
-            }""")
+            """)
 
-        expected = 'foo'
+        expected = "- list item\n" +\
+            "- and another one"
         self.assertEqual(rtf2md(text), expected)
 
 
