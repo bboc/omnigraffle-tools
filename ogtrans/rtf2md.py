@@ -1,12 +1,10 @@
 
 import re
 
-from textwrap import dedent
-
 """
 TODO: check other bullet types
 TODO: nested lists??
-TODO: special characters (like  ➤ 
+TODO: special characters (like  ➤)
 TODO: encode/decode unicode characters
 TODO: bold/regular/italics using OpenSans
 """
@@ -55,56 +53,3 @@ def rtf2md(text):
     if result.endswith('\\'):
         result = result[:-1]
     return result.strip()
-
-
-header_markers = [
-    r'{\rtf1',
-    # r'{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 LucidaGrande;}
-    r'{\colortbl;',
-    r'{\*\expandedcolortbl',
-    r'{\*\listtable',
-    r'{\*\listoverridetable',
-    r'\pard',
-]
-
-
-def is_header(line):
-    if not line.strip():
-        return True
-    for prefix in header_markers:
-        if line.startswith(prefix):
-            return True
-    return False
-
-
-font_pattern = re.compile(r'(?P<fontspec>(\\f(?P<id>\d+)(?P<info>\\.*?) (?P<font_name>.*?));)')
-
-
-def split_fonts(line):
-    fonts = {}
-    for match in font_pattern.findall(line):
-        fonts[match[2]] = match[4]
-    return fonts
-
-
-def split_rtf(text):
-    """Split RTF in header and contents, extract font table."""
-    header = []
-    contents = []
-    in_header = True
-    for line in text.strip().split('\n'):
-        if not line.strip():
-            continue
-        if in_header:
-            if is_header(line):
-                header.append(line)
-                continue
-            elif line.startswith(r'{\fonttbl'):
-                fonts = split_fonts(line)
-                header.append(line)
-                continue
-            else:
-                in_header = False
-        contents.append(line)
-
-    return dict(header='\n'.join(header), contents='\n'.join(contents)[:-1].strip(), fonts=fonts)
