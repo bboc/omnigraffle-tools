@@ -46,3 +46,60 @@ def rtf2md(text):
         for pattern, repl in replacements:
             result = pattern.sub(repl, result, re.DOTALL)
         return result
+
+# split text and control words on beginning of line that are not unicode strings
+content_start = re.compile(r'^(?P<controlwords>((\\[^\su]\S*)\s)+)(?P<text>.*)')
+
+header_markers = [
+    r'{\rtf1',
+    # r'{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 LucidaGrande;}
+    r'{\colortbl;',
+    r'{\*\expandedcolortbl',
+    r'{\*\listtable',
+    r'{\*\listoverridetable',
+    r'\pard',
+]
+
+
+def is_header(line):
+    if not line.strip():
+        return True
+    for prefix in header_markers:
+        if line.startswith(prefix):
+            return True
+    return False
+
+
+font_pattern = re.compile(r'^\{\\fonttbl((?P<font>(\\f(?P<id>\d+)(?P<info>\\.*?) (?P<font_name>.*?));)+)')
+
+
+def split_fonts(line):
+    fonts = {}
+    match = font_pattern.match(line)
+    gd = match.groupdict()
+    fonts[gd['id']] = gd['font_name']
+    # import pdb; pdb.set_trace() 
+    return fonts
+
+
+def split_rtf(text):
+    """Split RTF in header and contents, extract font table."""
+    header = []
+    contents = []
+    in_header = True
+    for line in text.strip().split('\n'):
+        if not line.strip():
+            continue
+        if in_header:
+            if is_header(line):
+                header.append(line)
+                continue
+            elif line.startswith(r'{\fonttbl'):
+                fonts = split_fonts(line)
+                header.append(line)
+                continue
+            else:
+                in_header = False
+        contents.append(line)
+
+    return dict(header='\n'.join(header), contents='\n'.join(contents)[:-1], fonts=fonts)
