@@ -70,15 +70,13 @@ def is_header(line):
     return False
 
 
-font_pattern = re.compile(r'^\{\\fonttbl((?P<font>(\\f(?P<id>\d+)(?P<info>\\.*?) (?P<font_name>.*?));)+)')
+font_pattern = re.compile(r'(?P<fontspec>(\\f(?P<id>\d+)(?P<info>\\.*?) (?P<font_name>.*?));)')
 
 
 def split_fonts(line):
     fonts = {}
-    match = font_pattern.match(line)
-    gd = match.groupdict()
-    fonts[gd['id']] = gd['font_name']
-    # import pdb; pdb.set_trace() 
+    for match in font_pattern.findall(line):
+        fonts[match[2]] = match[4]
     return fonts
 
 
@@ -102,4 +100,4 @@ def split_rtf(text):
                 in_header = False
         contents.append(line)
 
-    return dict(header='\n'.join(header), contents='\n'.join(contents)[:-1], fonts=fonts)
+    return dict(header='\n'.join(header), contents='\n'.join(contents)[:-1].strip(), fonts=fonts)
