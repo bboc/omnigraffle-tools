@@ -55,7 +55,8 @@ def print_unitest(element):
 
 
 def cmd_extract(args):
-    print("extract - not implemented")
+    print("extract - text")
+    pw = PlistWalker(args.document, verbose=True)
 
 
 def cmd_inject(args):
@@ -65,37 +66,36 @@ def cmd_inject(args):
 def cmd_dump(args):
     print("dump text")
 
+    def walk_plist(root, level=0, path='/'):
+        def tabbed(*args):
+            print(level * '  ', *args)
+
+        if type(root) == list:
+            tabbed('[')
+            for idx, item in enumerate(root):
+                walk_plist(item, level + 1, '%s[%s]' % (path, idx))
+            tabbed(']')
+        elif type(root) == dict:
+            tabbed('{')
+            for key, contents in root.items():
+                tabbed(key)
+                walk_plist(contents, level + 1, '%s{%s}' % (path, key))
+            tabbed('}')
+        else:
+            if type(root) == bytes:
+                tabbed(type(root), '…')
+            elif type(root) == str:
+                if root.crtswith(r'{\rtf'):
+                    tabbed(type(root), 'RTF-TEXT')
+                    print(path)
+                else:
+                    tabbed(type(root), root)
+            else:
+                tabbed(type(root), root)
+
     fp = open(args.document, 'rb')
     doc = plistlib.load(fp, fmt=plistlib.FMT_XML)
     walk_plist(doc)
-
-
-def walk_plist(root, indent=0, path='/'):
-    def tabbed(*args):
-        print(indent * '  ', *args)
-
-    if type(root) == list:
-        tabbed('[')
-        for idx, item in enumerate(root):
-            walk_plist(item, indent + 1, '%s[%s]' % (path, idx))
-        tabbed(']')
-    elif type(root) == dict:
-        tabbed('{')
-        for key, contents in root.items():
-            tabbed(key)
-            walk_plist(contents, indent + 1, '%s{%s}' % (path, key))
-        tabbed('}')
-    else:
-        if type(root) == bytes:
-            tabbed(type(root), '…')
-        elif type(root) == str:
-            if root.startswith(r'{\rtf'):
-                tabbed(type(root), 'RTF-TEXT')
-                print(path)
-            else:
-                tabbed(type(root), root)
-        else:
-            tabbed(type(root), root)
 
 
 def cmd_replace(args):
@@ -112,8 +112,48 @@ def cmd_replace(args):
 
 class PlistWalker(object):
 
-    def __init__(self, filename):
-        pass
+    def __init__(self, filename, verbose=False):
+        self.verbose = verbose
+        self.path = []
+        fp = open(filename, 'rb')
+        doc = plistlib.load(fp, fmt=plistlib.FMT_XML)
+
+        self.walk_plist(doc)
+
+    def walk_plist(self, current, level=0, name=''):
+        def tabbed(*args):
+            if self.verbose:
+                print(level * '  ', *args)
+
+        def node_value(item):
+            if type(item) == bytes:
+                return '<bytes>'
+            elif type(item) == str:
+                if item.startswith(r'{\rtf'):
+                    return 'RTF-TEXT'
+            return item
+
+        if type(current) == list:
+            tabbed('%s [' % name)
+            for idx, item in enumerate(current):
+                self.path.append('[%s]' % idx)
+                self.walk_plist(item, level + 1)
+                self.path.pop()
+            tabbed(']')
+        elif type(current) == dict:
+            tabbed('%s {' % name)
+            if 'Class' in current:
+                tabbed('class', current['Class'])
+            for key, item in current.items():
+                self.path.append('.%s' % key)
+                self.walk_plist(item, level + 1, key)
+                self.path.pop()
+            tabbed('}')
+        else:
+            value = node_value(current)
+            tabbed(name, ':', node_value(current))
+            if value == 'RTF-TEXT':
+                tabbed(''.join(self.path))
 
 
 def main():
