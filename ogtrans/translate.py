@@ -6,8 +6,7 @@ from textwrap import dedent
 import plistlib
 
 from .rtf2md import rtf2md
-
-
+from .rtf_processor import split_rtf
 
 substitute = dedent(r"""{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
 {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
@@ -171,8 +170,9 @@ class PlistTextExtractor(PlistWalker):
     def process(self):
         for item in self.text_containers:
             print('-' * 30)
-            print(item['Class'])
-            print(item['Text']['Text'])
+            raw_rtf = item['Text']['Text']
+            contents = split_rtf(raw_rtf)['contents']
+            print(rtf2md(contents))
 
 
 def main():
