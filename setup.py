@@ -11,6 +11,7 @@ setup(
     version="0.0.1",
     packages=find_packages(exclude='tests'),
     install_requires=['polib'],
+    tests_require=["pytest"],
     author="Bernhard Bockelbrink",
     author_email="bernhard.bockelbrink@gmail.com",
     description="Commandline tools to translate text in OmniGraffle files",
@@ -34,4 +35,5 @@ setup(
     },
     test_suite='tests',
     zip_safe=True,
+
 )

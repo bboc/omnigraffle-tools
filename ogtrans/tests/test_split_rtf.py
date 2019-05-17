@@ -1,6 +1,6 @@
 
 import unittest
-from rtf2md import split_rtf
+from ogtrans.rtf2md import split_rtf
 
 from textwrap import dedent
 

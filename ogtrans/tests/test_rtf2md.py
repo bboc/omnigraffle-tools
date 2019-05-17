@@ -1,6 +1,6 @@
 
 import unittest
-from rtf2md import rtf2md
+from ogtrans.rtf2md import rtf2md
 
 from textwrap import dedent
 
