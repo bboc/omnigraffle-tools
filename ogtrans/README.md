@@ -73,13 +73,14 @@ The following example defines a block of text in color (where supported). Note t
 From the examples I looked at, it's pretty simple to parse the RTF: 
 
 - simply ignore most headers by looking at the first few characters, if it starts with `\f…` it's probably the start of the text, so extract everything until the last `}` as the text
-- parse the header starting with `{\fonttbl` to find 
+- parse the header starting with `{\fonttbl` to find: 
 	- lists: ListMarker has font LucidaGrande
 	- special symbols: have ZapfDingbats
 	- optional (when using OpenSans: bold and regular fonts)
+- extract the control words at the beginning of the text to see if the font starts with bold or normal 
 - extract the text and use regex to convert to Markdown
-
-
+- when inserting, insert the new text after the control words, and use the font table to set the correct fonts. Colors should not matter, as the illustrations use just one color for each text
+- the conversion should use minimal whitespace, spaces instead of tabs, but preserve line breaks
 
 # How to store and retrieve translations
 
