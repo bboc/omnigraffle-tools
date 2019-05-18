@@ -2,6 +2,15 @@
 from collections import defaultdict
 
 import polib
+import re
+
+
+BASENAME_PATTERN = re.compile("(?P<basename>[^//]+?)\.graffle(/data\.plist)?$")
+
+
+def find_basename(path):
+    m = BASENAME_PATTERN.search(path)
+    return m.group('basename')
 
 
 class NewTranslationMemory(object):
