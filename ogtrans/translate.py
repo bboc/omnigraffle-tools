@@ -93,7 +93,7 @@ class PlistWalker(object):
     def walk_plist(self, current, level=0, name=''):
         def tabbed(*args):
             if self.verbose:
-                print(level * '  ', *args)
+                print(level * '  ', *args)  # noqa
 
         def node_value(item):
             if type(item) == bytes:
