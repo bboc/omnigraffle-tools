@@ -19,15 +19,19 @@ ogtranslate:
 		- bold/regular/italics using OpenSans @later
 	Translation workflow:
 		- extract filename from user data @na @done
-		- add markdown to translation memory @na
-		- dump markdown to file if filename is present @na
 		- set fixed length if present in userdata (see if that is possible in PO files!!)
-		- 
+		- add ability to process one canvas only @later
 		- create meaningful context information @done
 	
 	Implementation for Illustration:
-	- implement extractor @estimate(4h)
+	- implement extractor @estimate(4h) @done
+		- add markdown to translation memory @na @done
+		- dump markdown to file if filename is present @na @done
 	- implement injector @estimate(4h)
+		- read markdown files
+		- reat pot files
+		- quick and dirty rtf builder
+	- refactor: create one folder with name of omnigraffle file, in that is the pot-file and all markdown files
 	- make a full test run with illustrations and fix all problems @estimate(4h)
 	Extending the usecase: @later
 		- make test run with posters @estimate(30min)
