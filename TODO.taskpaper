@@ -18,11 +18,11 @@ ogtranslate:
 		- encode/decode unicode characters @later
 		- bold/regular/italics using OpenSans @later
 	Translation workflow:
-		- extract filename form user data @na
+		- extract filename from user data @na @done
 		- add markdown to translation memory @na
 		- dump markdown to file if filename is present @na
 		- set fixed length if present in userdata (see if that is possible in PO files!!)
-		- create meaningful context information
+		- create meaningful context information @done
 	
 	Implementation for Illustration:
 	- implement extractor @estimate(4h)

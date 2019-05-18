@@ -8,11 +8,16 @@ import plistlib
 from .rtf2md import rtf2md
 from .rtf_processor import split_rtf
 from .translatable import Translatable
+from .path import Path
+
 
 def cmd_extract(args):
     print("extract - text")
     pw = PlistTextExtractor(args.document)
-    pw.process()
+    for canvas in pw.doc['Sheets']:
+        pw.path = Path(canvas['SheetTitle'])
+        pw.walk_plist(canvas)
+        pw.process()
 
 
 def cmd_inject(args):
@@ -22,29 +27,32 @@ def cmd_inject(args):
 def cmd_dump(args):
     print("dump file as text")
     pw = PlistWalker(args.document, verbose=True)
+    pw.walk_plist(self.doc)
 
 
 def cmd_replace(args):
     print("test: replace text and write back ")
 
     pw = PlistWriteTester(args.document)
+    pw.walk_plist(self.doc)
     pw.process()
 
 
 class PlistWalker(object):
 
+    INDENTATION = '    '
+
     def __init__(self, filename, verbose=False):
         self.verbose = verbose
-        self._path = []
+        self.path = Path()
         fp = open(filename, 'rb')
         self.doc = plistlib.load(fp, fmt=plistlib.FMT_XML)
-
-        self.walk_plist(self.doc)
 
     def walk_plist(self, current, level=0, name=''):
         def tabbed(*args):
             if self.verbose:
-                print(level * '  ', *args)  # noqa
+                indent = level * self.INDENTATION
+                print(indent[:-1], *args) # noqa
 
         def node_value(item):
             if type(item) == bytes:
@@ -54,32 +62,33 @@ class PlistWalker(object):
                     return 'RTF-TEXT'
             return item
 
+        tabbed(self.path.to_string())
+
         # do whatever with this item...
         self.selector(current)
 
         if type(current) == list:
             tabbed('%s [' % name)
             for idx, item in enumerate(current):
-                self._path.append('[%s]' % idx)
+                self.path.append_list_item(idx, item)
                 self.walk_plist(item, level + 1)
-                self._path.pop()
+                self.path.pop()
             tabbed(']')
         elif type(current) == dict:
-            tabbed('%s {' % name)
+            if name:
+                tabbed('%s {' % name)
+            else:
+                tabbed('{')
             for key, item in current.items():
-                self._path.append('.%s' % key)
+                self.path.append('.%s' % key)
                 self.walk_plist(item, level + 1, key)
-                self._path.pop()
+                self.path.pop()
             tabbed('}')
         else:
             value = node_value(current)
             tabbed(name, ':', node_value(current))
             if value == 'RTF-TEXT':
-                tabbed(self.path)
-
-    @property
-    def path(self):
-        return ''.join(self._path)
+                tabbed(self.path.to_string())
 
     def selector(self, item):
         """Do whatever with any item that is traversed."""
@@ -101,7 +110,7 @@ class PlistTextExtractor(PlistWalker):
 
     def selector(self, current):
         if self.is_text_container(current) and self.has_text(current):
-            self.translatables.append(Translatable(current))
+            self.translatables.append(Translatable(current, self.path.to_string()))
 
     def is_text_container(self, current):
         return type(current) == dict and 'Class' in current and current['Class'] in self.GRAPHICS_CLASSES
@@ -121,6 +130,8 @@ class PlistTextExtractor(PlistWalker):
         for item in self.translatables:
             print('-' * 30)
             print(item.rtf.markdown)
+            print(item.destination)
+            print(item.context)
 
 
 class PlistWriteTester(PlistTextExtractor):
