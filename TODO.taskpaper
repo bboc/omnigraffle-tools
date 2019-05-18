@@ -1,40 +1,6 @@
 ogtranslate:
 	see ./ogrtrans/README.md for documentation
-	Preparation:
-		- clean up the documentation about ogtrans @estimate(30min) @done
-		- test if PO files containing MD can be properly translated in crowdin @done
-		- decide on how to save files, and how translations will be injected @estimate(1h) @done
-		- write a simple command that dumps contents of a full file as markdown @estimate(30min) @done
-	Cleanup:
-		- create a proper python package for ogtrans @estimate(1h) @done
-	rtf2md:
-		- can't find all text through XML, test plist parser @done
-		- write a more robust extractor for RTF that better identifies the actual text @done
-		- pick up all the usecases in the illustrations that are currently not supported @estimate(1h) @later
-		- fix all the usecases in the rtf2markdown converter @estimate(4h) @later
-		- check other bullet types @later
-		- check for nested lists?? @later
-		- process special characters (like  ➤) @later
-		- encode/decode unicode characters @later
-		- bold/regular/italics using OpenSans @later
-	Translation workflow:
-		- extract filename from user data @na @done
-		- add markdown to translation memory @na
-		- dump markdown to file if filename is present @na
-		- set fixed length if present in userdata (see if that is possible in PO files!!)
-		- create meaningful context information @done
-	
-	Implementation for Illustration:
-	- implement extractor @estimate(4h)
-	- implement injector @estimate(4h)
-	- make a full test run with illustrations and fix all problems @estimate(4h)
-	Extending the usecase: @later
-		- make test run with posters @estimate(30min)
-		- make a test run with the primer @estimate(30min)
-		- meke a plan how to fix what is still broken @estimate(30min)
-	Nice to have:
-		- research how to upload images to crowdin
-
+	see ./ogtrans/TODO.taskpaper for TODOs
 ogexport (JXA):
 	- write a small parser for commandline arguments and store them in associative array @done
 	✔ finish basic export for PNG @done (19-03-15 11:39)
