@@ -7,7 +7,7 @@ from textwrap import dedent
 
 from .path import Path
 from .document import PlistWalker, PlistTextExtractor, PlistWriteTester
-from .translate import NewTranslationMemory
+from .translate import find_basename, NewTranslationMemory
 
 
 class OmniGraffleTranslator(object):
@@ -27,6 +27,10 @@ class OmniGraffleTranslator(object):
         pass
 
     def cmd_extract_translations(self):
+        """
+        Extract text from args.source and write to a subfolder of args.target
+        with the name of the omnigraffle file.
+        """
         print("extract - text")
 
         # find all translatable text
@@ -35,22 +39,20 @@ class OmniGraffleTranslator(object):
             pw.path = Path(canvas['SheetTitle'])
             pw.walk_plist(canvas)
 
-        basename = self.find_basename(self.args.source)
-        if not os.path.exitst(self.args.target):
-            os.makedirs(self.args.target)
-        subdir = os.path.join(self.args.target, basename)
+        basename = find_basename(self.args.source)
+        outdir = os.path.join(self.args.target, basename)
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
         tm = NewTranslationMemory()
         for item in pw.translatables:
             if item.destination:
-                if not os.path.exists(subdir):
-                    os.makedirs(subdir)
-                fp = file(os.path.join(subdir, '%s.md' % item.destination), 'w+')
+                fp = open(os.path.join(outdir, '%s.md' % item.destination), 'w+')
                 fp.write(item.rtf.markdown)
                 fp.close()
                 # dump markdown to file
             else:
                 tm.add(item.rtf.markdown, item.context)
-        tm.dump_translation_memory(subdir)
+        tm.dump_translation_memory(os.path.join(outdir, basename))
 
     def cmd_translate(self):
         print("translate document - not implemented")

@@ -31,7 +31,7 @@ ogtranslate:
 		- read markdown files
 		- reat pot files
 		- quick and dirty rtf builder
-	- refactor: create one folder with name of omnigraffle file, in that is the pot-file and all markdown files
+	- refactor: create one folder with name of omnigraffle file, in that is the pot-file and all markdown files @done
 	- make a full test run with illustrations and fix all problems @estimate(4h)
 	Extending the usecase: @later
 		- make test run with posters @estimate(30min)
