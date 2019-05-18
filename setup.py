@@ -30,7 +30,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'ogtrans = ogtrans.translate:main',
+            'ogtrans = ogtrans.commands:main',
         ],
     },
     test_suite='tests',
