@@ -25,6 +25,8 @@ Here's all of the full paths I have found so far:
 - document{Sheets}[9]{GraphicsList}[6]{Text}{Text}
 
 
+Context: Sheet: SheetTitle
+
 # Working with RTF
 
 An rtf document has a header with several blocks, and then the text starts, typically with a few control words setting fonts and colors. In all examples I looked at, the test started after the foreground color `\cf0`
