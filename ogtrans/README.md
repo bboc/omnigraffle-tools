@@ -6,6 +6,25 @@ Right now that is relevant for Hebrew, Dutch and Russian translations of the S3 
 
 After some experiments with XML libraries it's clear that Python's [plistlib](https://docs.python.org/3/library/plistlib.html) is the way to go. Traverse the plist and identify all strings that start with "{\rtf1}". 
 
+Strings are located in the following elements in subelements Text/Text (String):
+
+- class LineGraphic
+- class ShapedGraphic
+
+And not in: 
+
+- class Group
+- class GraffleShapes.CanvasBackgroundGraphic
+- class TableGroup
+
+Here's all of the full paths I have found so far:
+
+- document{MasterSheets}[0]{GraphicsList}[0]{Text}{Text}
+- document{Sheets}[12]{GraphicsList}[6]{Graphics}[1]{Graphics}[0]{Text}{Text}
+- document{Sheets}[9]{GraphicsList}[5]{Graphics}[1]{Text}{Text}
+- document{Sheets}[9]{GraphicsList}[6]{Text}{Text}
+
+
 # Working with RTF
 
 An rtf document has a header with several blocks, and then the text starts, typically with a few control words setting fonts and colors. In all examples I looked at, the test started after the foreground color `\cf0`
