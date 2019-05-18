@@ -2,10 +2,12 @@
 
 import argparse
 import logging
+import os
 from textwrap import dedent
 
 from .path import Path
 from .document import PlistWalker, PlistTextExtractor, PlistWriteTester
+from .translate import NewTranslationMemory
 
 
 class OmniGraffleTranslator(object):
@@ -24,14 +26,31 @@ class OmniGraffleTranslator(object):
         """Hook to validate commandline arguments."""
         pass
 
-
     def cmd_extract_translations(self):
         print("extract - text")
+
+        # find all translatable text
         pw = PlistTextExtractor(self.args.source)
         for canvas in pw.doc['Sheets']:
             pw.path = Path(canvas['SheetTitle'])
             pw.walk_plist(canvas)
-            pw.process()
+
+        basename = self.find_basename(self.args.source)
+        if not os.path.exitst(self.args.target):
+            os.makedirs(self.args.target)
+        subdir = os.path.join(self.args.target, basename)
+        tm = NewTranslationMemory()
+        for item in pw.translatables:
+            if item.destination:
+                if not os.path.exists(subdir):
+                    os.makedirs(subdir)
+                fp = file(os.path.join(subdir, '%s.md' % item.destination), 'w+')
+                fp.write(item.rtf.markdown)
+                fp.close()
+                # dump markdown to file
+            else:
+                tm.add(item.rtf.markdown, item.context)
+        tm.dump_translation_memory(subdir)
 
     def cmd_translate(self):
         print("translate document - not implemented")
@@ -89,6 +108,8 @@ class OmniGraffleTranslator(object):
                                    help="Extract a POT file from an Omnigraffle document.")
         sp.add_argument('source', type=str,
                         help='an OmniGraffle file')
+        sp.add_argument('target', type=str,
+                        help='target folder')
         sp.add_argument('--canvas', type=str,
                         help='translate canvas with given name')
         OmniGraffleTranslator.add_verbose(sp)

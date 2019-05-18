@@ -32,8 +32,6 @@ class Translatable(object):
         except KeyError:
             return None
 
-
-
     @property
     def klass(self):
         return self.og_object['Class']
