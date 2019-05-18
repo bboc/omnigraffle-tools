@@ -1,60 +1,145 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import logging
+from textwrap import dedent
+
 from .path import Path
 from .document import PlistWalker, PlistTextExtractor, PlistWriteTester
 
 
-def cmd_extract(args):
-    print("extract - text")
-    pw = PlistTextExtractor(args.document)
-    for canvas in pw.doc['Sheets']:
-        pw.path = Path(canvas['SheetTitle'])
-        pw.walk_plist(canvas)
+class OmniGraffleTranslator(object):
+
+    def __init__(self, args=None):
+        """Read args from commandline if not present, and connect to OmniGraffle app."""
+        if args:
+            self.args = args
+        else:
+            self.args = self.parse_commandline()
+
+        self._check_args()
+        self.doc = None
+
+    def _check_args(self):
+        """Hook to validate commandline arguments."""
+        pass
+
+
+    def cmd_extract_translations(self):
+        print("extract - text")
+        pw = PlistTextExtractor(self.args.source)
+        for canvas in pw.doc['Sheets']:
+            pw.path = Path(canvas['SheetTitle'])
+            pw.walk_plist(canvas)
+            pw.process()
+
+    def cmd_translate(self):
+        print("translate document - not implemented")
+
+    def cmd_dump(self):
+        print("dump file as text")
+        pw = PlistWalker(self.args.source, verbose=True)
+        pw.walk_plist(pw.doc)
+
+    def cmd_replace(self):
+        print("test: replace text and write back ")
+
+        pw = PlistWriteTester(self.args.source)
+        pw.walk_plist(pw.doc)
         pw.process()
 
+    def parse_commandline(self):
+        """Parse commandline, do some checks and return args."""
 
-def cmd_inject(args):
-    print("inject - not implemented")
+        parser = self.get_parser()
+        args = parser.parse_args()
+        # set up loglevel
+        logging.basicConfig(level=args.loglevel)
+        return args
 
+    @staticmethod
+    def add_verbose(parser):
+        parser.add_argument(
+            '-d', '--debug',
+            help="print debug output",
+            action="store_const", dest="loglevel", const=logging.DEBUG,
+            default=logging.WARNING
+        )
+        parser.add_argument(
+            '-v', '--verbose',
+            help="more detailed output",
+            action="store_const", dest="loglevel", const=logging.INFO,
+        )
 
-def cmd_dump(args):
-    print("dump file as text")
-    pw = PlistWalker(args.document, verbose=True)
-    pw.walk_plist(pw.doc)
+    @staticmethod
+    def get_parser():
+        parser = argparse.ArgumentParser(fromfile_prefix_chars='@',
+                                         description="Translate canvases in OmniGraffle 6.",
+                                         epilog="If a file fails, simply try again.")
 
+        subparsers = parser.add_subparsers()
+        OmniGraffleTranslator.add_parser_extract(subparsers)
+        OmniGraffleTranslator.add_parser_list(subparsers)
+        OmniGraffleTranslator.add_parser_translate(subparsers)
+        return parser
 
-def cmd_replace(args):
-    print("test: replace text and write back ")
+    @staticmethod
+    def add_parser_extract(subparsers):
+        sp = subparsers.add_parser('extract',
+                                   help="Extract a POT file from an Omnigraffle document.")
+        sp.add_argument('source', type=str,
+                        help='an OmniGraffle file')
+        sp.add_argument('--canvas', type=str,
+                        help='translate canvas with given name')
+        OmniGraffleTranslator.add_verbose(sp)
+        sp.set_defaults(func=OmniGraffleTranslator.cmd_extract_translations)
 
-    pw = PlistWriteTester(args.document)
-    pw.walk_plist(pw.doc)
-    pw.process()
+    @staticmethod
+    def add_parser_list(subparsers):
+        sp = subparsers.add_parser('dump',
+                                   help="Dump file structure")
+        sp.add_argument('source', type=str,
+                        help='an OmniGraffle file')
+        OmniGraffleTranslator.add_verbose(sp)
+        sp.set_defaults(func=OmniGraffleTranslator.cmd_dump)
+
+    @staticmethod
+    def add_parser_translate(subparsers):
+        sp = subparsers.add_parser('translate',
+                                   description=dedent("""Translate an Omnigraffle document(s) using po-files.
+
+                                        If any of the parameters is a directory, actual filenames will be
+                                        inferred from source file, if source is a directory, all OmniGraffle
+                                        documents in that folder will be processed.
+                                        Example:
+
+                                           ogtranslate translate graffle/src/ graffle/de/ text/de/
+
+                                        will create translated copies from each document found in graffle/src
+                                        in graffle/de, using a separate po-file for each document, located
+                                        in graffle/de.
+
+                                            ogtranslate translate graffle/src/ graffle/de/ text/de/all.po
+
+                                        will create translated copies from each document found in graffle/src
+                                        in graffle/de, using text/de/all.po for translating each document."""))
+        sp.add_argument('source', type=str,
+                        help='an OmniGraffle document or a folder')
+        sp.add_argument('target', type=str,
+                        help='target filename or folder')
+        sp.add_argument('translations', type=str,
+                        help='a po-file or a folder')
+        # sp.add_argument('language', type=str,
+        #                 help='two-digit language identifier')
+        OmniGraffleTranslator.add_verbose(sp)
+        sp.set_defaults(func=OmniGraffleTranslator.cmd_translate)
 
 
 def main():
-
-    # create the top-level parser
-    parser = argparse.ArgumentParser(prog='ogtranslate')
-    parser.add_argument('document', help='the OmniGraffle document (or the plist inside it')
-    subparsers = parser.add_subparsers(help='sub-command help')
-
-    p_extract = subparsers.add_parser('extract', help='extract text from OmniGraffle document')
-    p_extract.add_argument('target', help='target file')
-    p_extract.set_defaults(func=cmd_extract)
-    p_inject = subparsers.add_parser('inject', help='inject text into OmniGraffle document')
-    p_inject.add_argument('text_source', help='text file')
-    p_inject.set_defaults(func=cmd_inject)
-
-    p_dump = subparsers.add_parser('dump', help='dump text into OmniGraffle document')
-    p_dump.set_defaults(func=cmd_dump)
-
-    p_replace = subparsers.add_parser('replace', help='replace text and write back')
-    p_replace.set_defaults(func=cmd_replace)
-
-    args = parser.parse_args()
-    args.func(args)
+    translator = OmniGraffleTranslator()
+    translator.args.func(translator)
 
 
 if __name__ == "__main__":
     main()
+
