@@ -7,7 +7,7 @@ import plistlib
 
 from .rtf2md import rtf2md
 from .rtf_processor import split_rtf
-
+from .translatable import Translatable
 
 def cmd_extract(args):
     print("extract - text")
@@ -96,18 +96,17 @@ class PlistTextExtractor(PlistWalker):
     ]
 
     def __init__(self, filename):
-        self.text_containers = []
+        self.translatables = []
         super().__init__(filename)
 
     def selector(self, current):
         if self.is_text_container(current) and self.has_text(current):
-            self.text_containers.append(current)
+            self.translatables.append(Translatable(current))
 
     def is_text_container(self, current):
         return type(current) == dict and 'Class' in current and current['Class'] in self.GRAPHICS_CLASSES
 
     def has_text(self, current):
-
         try:
             text = current['Text']['Text']
         except KeyError:
@@ -119,12 +118,9 @@ class PlistTextExtractor(PlistWalker):
             return False
 
     def process(self):
-        for item in self.text_containers:
-            # TODO: check for user-info
+        for item in self.translatables:
             print('-' * 30)
-            raw_rtf = item['Text']['Text']
-            contents = split_rtf(raw_rtf)['contents']
-            print(rtf2md(contents))
+            print(item.rtf.markdown)
 
 
 class PlistWriteTester(PlistTextExtractor):
@@ -139,8 +135,8 @@ class PlistWriteTester(PlistTextExtractor):
         \f0\fs32 \cf0 Replaced text}""").strip()
 
     def process(self):
-        for item in self.text_containers:
-            item['Text']['Text'] = self.SUBSTITUTE
+        for item in self.translatables:
+            item.raw_text = self.SUBSTITUTE
 
         fp = open('out.graffle', 'wb')
         plistlib.dump(self.doc, fp, fmt=plistlib.FMT_XML, sort_keys=True, skipkeys=False)

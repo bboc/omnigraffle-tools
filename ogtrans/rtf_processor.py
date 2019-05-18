@@ -1,4 +1,5 @@
 import re
+from .rtf2md import rtf2md
 
 
 class RtfObject(object):
@@ -7,15 +8,23 @@ class RtfObject(object):
         self.raw_rtf = raw_rtf
         self.fonts = []
         self.header = ''
-        self.content = ''
+        self.contents = ''
         self.preprocess()
 
     def preprocess(self):
         """Extract header, contents and font table."""
         result = split_rtf(self.raw_rtf)
         self.header = result['header']
-        self.content = result['content']
+        self.contents = result['contents']
         self.fonts = result['fonts']
+
+    @property
+    def markdown(self):
+        return rtf2md(self.contents)
+
+    @markdown.setter
+    def markdown(self, value):
+        pass
 
 
 HEADER_MARKERS = [
