@@ -31,7 +31,6 @@ class TranslateTests(unittest.TestCase):
 
         tr = OmniGraffleTranslator(args)
         tr.args.func(tr)
-
         self.assertTrue(os.path.exists(os.path.join(tmpfolder.name, 'rtfprocessor-tests.graffle')))
 
     def test_po_and_markdown(self):
@@ -50,4 +49,17 @@ class TranslateTests(unittest.TestCase):
         """
         source: dir, target: single po file
         """
-        self.fail("not implemented")
+        tmpfolder = tempfile.TemporaryDirectory(dir=self.tmp_path)
+
+        args = Namespace(canvas=None,
+                         func=OmniGraffleTranslator.cmd_translate,
+                         loglevel=30,
+                         source=self.test_data,
+                         target=tmpfolder.name,
+                         translations=os.path.join(self.test_data, 'translations', 'rtfprocessor-tests', 'rtfprocessor-tests.po'),)
+
+        tr = OmniGraffleTranslator(args)
+        tr.args.func(tr)
+        self.assertTrue(os.path.exists(os.path.join(tmpfolder.name, 'rtfprocessor-tests.graffle')))
+        self.assertTrue(os.path.exists(os.path.join(tmpfolder.name, 'rtfprocessor-tests-copy.graffle')))
+
