@@ -5,7 +5,7 @@
 	<key>ApplicationVersion</key>
 	<array>
 		<string>com.omnigroup.OmniGraffle7</string>
-		<string>196.1.0.331130</string>
+		<string>195.13.0.328142</string>
 	</array>
 	<key>ColorProfiles</key>
 	<array>
@@ -593,7 +593,7 @@
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2019-05-11 16:21:22 +0000</string>
+	<string>2019-05-18 09:38:31 +0000</string>
 	<key>Modifier</key>
 	<string>Bernhard Bockelbrink</string>
 	<key>MovementHandleVisible</key>
@@ -1352,7 +1352,7 @@
 		</dict>
 		<dict>
 			<key>ActiveLayerIndex</key>
-			<integer>0</integer>
+			<integer>1</integer>
 			<key>AllLayers</key>
 			<array>
 				<string>shared</string>
@@ -1954,7 +1954,7 @@
 					<key>ID</key>
 					<integer>7</integer>
 					<key>Name</key>
-					<string>foo</string>
+					<string>large-textbox</string>
 					<key>Style</key>
 					<dict>
 						<key>shadow</key>
@@ -2507,6 +2507,11 @@ Line Label}</string>
 	<string>YES</string>
 	<key>UseEntirePage</key>
 	<false/>
+	<key>UserInfo</key>
+	<dict>
+		<key>kMDItemAuthors</key>
+		<array/>
+	</dict>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
@@ -2527,7 +2532,7 @@ Line Label}</string>
 		<string>{{244, 85}, {1278, 779}}</string>
 		<key>WindowInfo_InspectorTab</key>
 		<array>
-			<string>com.omnigroup.OmniGraffle.inspectorGroup.document</string>
+			<string>com.omnigroup.OmniGraffle.inspectorGroup.properties</string>
 		</array>
 		<key>ZoomValues</key>
 		<array>
