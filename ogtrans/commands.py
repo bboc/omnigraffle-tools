@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 import plistlib
+import shutil
 from textwrap import dedent
 
 from .path import Path
@@ -35,6 +36,7 @@ Do we need keys and template files?
     - copy templates and fill in translations template files
 """
 
+
 class OmniGraffleTranslator(object):
 
     def __init__(self, args=None):
@@ -60,11 +62,7 @@ class OmniGraffleTranslator(object):
 
         # find all translatable text
         pw = PlistTextExtractor(self.args.source)
-        for canvas in pw.doc['Sheets']:
-            # TODO: add filter for single canvas here
-            pw.path = Path(canvas['SheetTitle'])
-            pw.walk_plist(canvas)
-
+        pw.collect_translatables()
         basename = find_basename(self.args.source)
         outdir = os.path.join(self.args.target, basename)
         if not os.path.exists(outdir):
@@ -88,12 +86,17 @@ class OmniGraffleTranslator(object):
         inferred from source file, if source is a directory, all OmniGraffle
         documents in that folder will be processed.
         """
-        print("translate document - not implemented")
-        # TODO: check if target == source
+        print("translate document")
+        # TODO: check if target == source (also: target is dir and same as dir of sourcefile)
 
         if not os.path.exists(self.args.source):
             logging.error("source '%s' does not exist", self.args.source)
             return
+
+        # create target as directory if it does not exist
+        # FIXME: target might be a file (ending in .graffle)
+        if not os.path.exists(self.args.target):
+            os.makedirs(self.args.target)
 
         if os.path.isdir(self.args.source):
             for filename in sorted(os.listdir(self.args.source)):
@@ -104,29 +107,56 @@ class OmniGraffleTranslator(object):
         else:
             self.translate_document(self.args.source, self.args.target, self.args.translations)
 
-    def translate_document(self, source, target, translations):
-        """Create a copy of an OmniGraffle document and then translate it."""
-        self.open_copy_of_document(source, target=target)
+    def translate_document(self, source_filename, target, translations):
+        """Translate an OmniGraffle document and save result to new location."""
+
+        document_basename = find_basename(source_filename)
+        # translations: file: open PO file
+        #               folder: check if contains PO file with basename, open that
+        #               otherwise: open subfolder/basename.po
         if os.path.isdir(translations):
-            tm_file = os.path.join(translations, os.path.splitext(os.path.basename(source))[0] + '.po')
+            for file in [os.path.join(translations, document_basename + '.po'),
+                     os.path.join(directory, document_basename, document_basename +'.po')]:
+                if os.path.exists(file):
+                    tm_file = file
+            else:
+                raise Exception('po-file not found', translations, document_basename)
         else:
             tm_file = translations
-        tm = self.read_translation_memory(tm_file)
+        tm = TranslationMemoryFile(tm_file)
+        # open plist and extract translatables
+        pw = PlistTextExtractor(source_filename)
+        pw.collect_translatables()
+        # go through translatables and translate using PO and md files (if present)
+        # TODO: tl might be empty, what then?
+        for item in pw.translatables:
+            if item.destination:
+                tl = self.get_translation_from_file(item.destination, translations)
+            else:
+                tl = tm.translate(item.rtf.markdown)
+                item.rtf.markdown = tl
+            if tl:
+                item.translate(tl)
 
+        # find out what the new document's filename is (target is filename or directory?)
+        # TODO: what about files that contain images??
+        if target.endswith('.graffle') or target.endswith('.plist'):
+            target_filename = target
+        else:
+            target_filename = os.path.join(target, '%s.%s' % (document_basename, 'graffle'))
 
-        for canvas in self.doc.canvases():
-            c = Canvas(canvas)
-            c.walk(partial(inject_translations, tm))
+        # then save result to new document
+        fp = open(target_filename, 'wb')
+        plistlib.dump(self.doc, fp, fmt=plistlib.FMT_XML, sort_keys=True, skipkeys=False)
 
-        self.og.windows.first().save()
-
-    def open_copy_of_document(self, source, target=None, suffix=None):
+    def copy_document(self, source, target):
         """
-        Create and open a copy of an omnigraffle document.
-        Target takes precedence over sufix, if target is given and is a directory, the target
-        file name will be created from target and the basename of source. If target is ommited,
-        but suffix is given, the target filename will be created by extending source with suffix.
+        Create a copy of an omnigraffle document.
+
+        If target is directory, create document with same basename, otherwise use target as
+        document name.
         """
+        # FIXME: this code is wrong
         if target:
             if os.path.isdir(target):
                 # create full target file name from basenam of source file
@@ -134,10 +164,19 @@ class OmniGraffleTranslator(object):
         if suffix and not target:
             root, ext = os.path.splitext(source)
             target = root + '-' + suffix + ext
-        print("copy:", source, target)
-        shutil.copyfile(source, target)
-        self.open_document(target)
+        shutil.copy(source, new_filename)
 
+    def get_translation_from_file(self, filename, directory, document_basename):
+        """
+        Read translations from <filename>.md file that is either in <directory>, or in
+        subdirectory <basename>. Raise exception if file not found.
+        """
+        for file in [os.path.join(directory, filename),
+                     os.path.join(directory, document_basename, filename)]:
+            if os.path.exists(file):
+                with open(file, 'r') as fp:
+                    return fp.read()
+            raise Exception('file not found', filename, directory, document_basename)
 
     def cmd_dump(self):
         print("dump file as text")
@@ -229,7 +268,9 @@ class OmniGraffleTranslator(object):
 
                                         If any of the parameters is a directory, actual filenames will be
                                         inferred from source file, if source is a directory, all OmniGraffle
-                                        documents in that folder will be processed.
+                                        documents in that folder will be processed. If translation is a folder,
+                                        ogrtrans will look for translations in that folder as well as in
+                                        subfolders with each document's names.
                                         Example:
 
                                            ogtranslate translate graffle/src/ graffle/de/ text/de/
@@ -262,4 +303,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

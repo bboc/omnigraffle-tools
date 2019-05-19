@@ -28,11 +28,11 @@ ogtranslate:
 		- add markdown to translation memory @na @done
 		- dump markdown to file if filename is present @na @done
 	- implement injector @estimate(4h)
-		- iterate over all source 
+		- iterate over all source @done
 		- make copy of source file
-		- read markdown files @na
-		- reat pot files @na
-		- quick and dirty rtf builder @na
+		- read markdown files @na @done
+		- read pot files @na @done
+		- quick and dirty rtf builder @na @done
 	- refactor: create one folder with name of omnigraffle file, in that is the pot-file and all markdown files @done
 	Test Run with illustrations:
 		- make a full test run with illustrations and list all problems @estimate(2h)
@@ -41,5 +41,6 @@ ogtranslate:
 		- make test run with posters @estimate(30min)
 		- make a test run with the primer @estimate(30min)
 		- meke a plan how to fix what is still broken @estimate(30min)
+		- transparently handle documents that cointain images (omni.graffle/data.plist): copy source, then edit plist
 	Nice to have:
 		- research how to upload images to crowdin

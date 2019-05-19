@@ -93,3 +93,9 @@ class PlistTextExtractor(PlistWalker):
             return True
         else:
             return False
+
+    def collect_translatables(self, canvas=None):
+        for canvas in pw.doc['Sheets']:
+            # TODO: add filter for single canvas here
+            self.path = Path(canvas['SheetTitle'])
+            self.walk_plist(canvas)

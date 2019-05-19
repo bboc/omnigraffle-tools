@@ -1,6 +1,6 @@
 import re
 from .rtf2md import rtf2md
-
+from .md2rtf import md2rtf
 
 class RtfObject(object):
 
@@ -24,7 +24,8 @@ class RtfObject(object):
 
     @markdown.setter
     def markdown(self, value):
-        pass
+        """Create raw_rtf from markdown."""
+        self.raw_rtf = '\n'.join(self.header, md2rtf(value))
 
 
 HEADER_MARKERS = [
