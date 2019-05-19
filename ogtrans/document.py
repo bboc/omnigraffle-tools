@@ -93,29 +93,3 @@ class PlistTextExtractor(PlistWalker):
             return True
         else:
             return False
-
-    def process(self):
-        for item in self.translatables:
-            print('-' * 30)
-            print(item.rtf.markdown)
-            print(item.destination)
-            print(item.context)
-
-
-class PlistWriteTester(PlistTextExtractor):
-
-    SUBSTITUTE = dedent(r"""
-        {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
-        {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
-        {\colortbl;\red255\green255\blue255;}
-        {\*\expandedcolortbl;;}
-        \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc\partightenfactor0
-
-        \f0\fs32 \cf0 Replaced text}""").strip()
-
-    def process(self):
-        for item in self.translatables:
-            item.raw_text = self.SUBSTITUTE
-
-        fp = open('out.graffle', 'wb')
-        plistlib.dump(self.doc, fp, fmt=plistlib.FMT_XML, sort_keys=True, skipkeys=False)

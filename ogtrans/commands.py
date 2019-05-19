@@ -3,17 +3,42 @@
 import argparse
 import logging
 import os
+import plistlib
 from textwrap import dedent
 
 from .path import Path
-from .document import PlistWalker, PlistTextExtractor, PlistWriteTester
-from .translate import find_basename, NewTranslationMemory
+from .document import PlistWalker, PlistTextExtractor
+from .translate import find_basename, NewTranslationMemory, TranslationMemoryFile
 
+"""
+Translation of Omnigrafle files
+
+1. Create Translation memory
+    - get all cavases in file
+    - for each canvas: get all text objects and dump to pot-file
+
+2. Update translatiosn
+    - create a copy of OmniGraffle source file language suffix
+    - read po-file and make a translation dictionary d[msgid] = msgstr
+        (replace newlines and quotes!!)
+    - walk through all objects, if text: replace with translated text
+    - save
+
+TODO: how to make sure OmniGraffle files are not changed between exporting pot and translation?
+    Create dedicated image repo (needs branchens for each resource release) or add to the repo
+     where illustrations are used (adds lots of duplication)
+
+Do we need keys and template files?
+
+    - create a key (hash) for each text
+    - create a omnigraffle template file where texts are replaced by hashes
+    - copy templates and fill in translations template files
+"""
 
 class OmniGraffleTranslator(object):
 
     def __init__(self, args=None):
-        """Read args from commandline if not present, and connect to OmniGraffle app."""
+        """Read args from commandline if not present."""
         if args:
             self.args = args
         else:
@@ -36,6 +61,7 @@ class OmniGraffleTranslator(object):
         # find all translatable text
         pw = PlistTextExtractor(self.args.source)
         for canvas in pw.doc['Sheets']:
+            # TODO: add filter for single canvas here
             pw.path = Path(canvas['SheetTitle'])
             pw.walk_plist(canvas)
 
@@ -55,7 +81,63 @@ class OmniGraffleTranslator(object):
         tm.dump_translation_memory(os.path.join(outdir, basename))
 
     def cmd_translate(self):
+        """
+        Inject translations from po-files into OmniGraffle document(s).
+
+        If any of the parameters is a directory, actual filenames will be
+        inferred from source file, if source is a directory, all OmniGraffle
+        documents in that folder will be processed.
+        """
         print("translate document - not implemented")
+        # TODO: check if target == source
+
+        if not os.path.exists(self.args.source):
+            logging.error("source '%s' does not exist", self.args.source)
+            return
+
+        if os.path.isdir(self.args.source):
+            for filename in sorted(os.listdir(self.args.source)):
+                if filename.endswith(".graffle"):
+                    self.translate_document(os.path.join(self.args.source, filename),
+                                            self.args.target,
+                                            self.args.translations)
+        else:
+            self.translate_document(self.args.source, self.args.target, self.args.translations)
+
+    def translate_document(self, source, target, translations):
+        """Create a copy of an OmniGraffle document and then translate it."""
+        self.open_copy_of_document(source, target=target)
+        if os.path.isdir(translations):
+            tm_file = os.path.join(translations, os.path.splitext(os.path.basename(source))[0] + '.po')
+        else:
+            tm_file = translations
+        tm = self.read_translation_memory(tm_file)
+
+
+        for canvas in self.doc.canvases():
+            c = Canvas(canvas)
+            c.walk(partial(inject_translations, tm))
+
+        self.og.windows.first().save()
+
+    def open_copy_of_document(self, source, target=None, suffix=None):
+        """
+        Create and open a copy of an omnigraffle document.
+        Target takes precedence over sufix, if target is given and is a directory, the target
+        file name will be created from target and the basename of source. If target is ommited,
+        but suffix is given, the target filename will be created by extending source with suffix.
+        """
+        if target:
+            if os.path.isdir(target):
+                # create full target file name from basenam of source file
+                target = os.path.join(target, os.path.basename(source))
+        if suffix and not target:
+            root, ext = os.path.splitext(source)
+            target = root + '-' + suffix + ext
+        print("copy:", source, target)
+        shutil.copyfile(source, target)
+        self.open_document(target)
+
 
     def cmd_dump(self):
         print("dump file as text")
@@ -67,7 +149,21 @@ class OmniGraffleTranslator(object):
 
         pw = PlistWriteTester(self.args.source)
         pw.walk_plist(pw.doc)
-        pw.process()
+
+        SUBSTITUTE = dedent(r"""
+                {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
+                {\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
+                {\colortbl;\red255\green255\blue255;}
+                {\*\expandedcolortbl;;}
+                \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc\partightenfactor0
+
+                \f0\fs32 \cf0 Replaced text}""").strip()
+
+        for item in pw.translatables:
+            item.raw_text = SUBSTITUTE
+
+        fp = open('out.graffle', 'wb')
+        plistlib.dump(self.doc, fp, fmt=plistlib.FMT_XML, sort_keys=True, skipkeys=False)
 
     def parse_commandline(self):
         """Parse commandline, do some checks and return args."""
@@ -99,13 +195,13 @@ class OmniGraffleTranslator(object):
                                          epilog="If a file fails, simply try again.")
 
         subparsers = parser.add_subparsers()
-        OmniGraffleTranslator.add_parser_extract(subparsers)
-        OmniGraffleTranslator.add_parser_list(subparsers)
-        OmniGraffleTranslator.add_parser_translate(subparsers)
+        OmniGraffleTranslator.cmd_extract_subparser(subparsers)
+        OmniGraffleTranslator.cmd_dump_subparser(subparsers)
+        OmniGraffleTranslator.cmd_translate_subparser(subparsers)
         return parser
 
     @staticmethod
-    def add_parser_extract(subparsers):
+    def cmd_extract_subparser(subparsers):
         sp = subparsers.add_parser('extract',
                                    help="Extract a POT file from an Omnigraffle document.")
         sp.add_argument('source', type=str,
@@ -118,7 +214,7 @@ class OmniGraffleTranslator(object):
         sp.set_defaults(func=OmniGraffleTranslator.cmd_extract_translations)
 
     @staticmethod
-    def add_parser_list(subparsers):
+    def cmd_dump_subparser(subparsers):
         sp = subparsers.add_parser('dump',
                                    help="Dump file structure")
         sp.add_argument('source', type=str,
@@ -127,7 +223,7 @@ class OmniGraffleTranslator(object):
         sp.set_defaults(func=OmniGraffleTranslator.cmd_dump)
 
     @staticmethod
-    def add_parser_translate(subparsers):
+    def cmd_translate_subparser(subparsers):
         sp = subparsers.add_parser('translate',
                                    description=dedent("""Translate an Omnigraffle document(s) using po-files.
 
@@ -151,7 +247,7 @@ class OmniGraffleTranslator(object):
         sp.add_argument('target', type=str,
                         help='target filename or folder')
         sp.add_argument('translations', type=str,
-                        help='a po-file or a folder')
+                        help='a po-file or a folder that contains PO file and potentially other files')
         # sp.add_argument('language', type=str,
         #                 help='two-digit language identifier')
         OmniGraffleTranslator.add_verbose(sp)
@@ -160,6 +256,7 @@ class OmniGraffleTranslator(object):
 
 def main():
     translator = OmniGraffleTranslator()
+    print(repr(translator.args))
     translator.args.func(translator)
 
 
