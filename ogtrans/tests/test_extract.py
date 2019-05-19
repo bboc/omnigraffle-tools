@@ -10,6 +10,8 @@ from ogtrans.commands import OmniGraffleTranslator
 class ExtractTranslationsTests(unittest.TestCase):
 
     def setUp(self):
+        self.test_data = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test-data')
+
         self.tmp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tmp')
         if not os.path.exists(self.tmp_path):
             os.makedirs(self.tmp_path)
@@ -19,15 +21,17 @@ class ExtractTranslationsTests(unittest.TestCase):
         """
         Extract translations
         """
-        self.fail("not implemented")
         tmpfolder = tempfile.TemporaryDirectory(dir=self.tmp_path)
 
         args = Namespace(canvas=None,
                          func=OmniGraffleTranslator.cmd_extract_translations,
                          loglevel=30,
-                         source='ogtrans/test-data/rtfprocessor-tests.graffle',
+                         source=os.path.join(self.test_data, 'rtfprocessor-tests.graffle'),
                          target=tmpfolder.name)
 
         tr = OmniGraffleTranslator(args)
         tr.args.func(tr)
-
+        translations = os.path.join(tmpfolder.name, 'rtfprocessor-tests')
+        self.assertTrue(os.path.exists(translations))
+        self.assertTrue(os.path.exists(os.path.join(translations, 'rtfprocessor-tests.pot')))
+        self.assertTrue(os.path.exists(os.path.join(translations, 'textbox-a.md')))
