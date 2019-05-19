@@ -64,8 +64,6 @@ class TranslateBasicTests(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.tmpfolder.name, 'rtfprocessor-tests.graffle')))
         self.assertTrue(os.path.exists(os.path.join(self.tmpfolder.name, 'rtfprocessor-tests-copy.graffle')))
 
-
-
     def test_multiple_files_single_po(self):
         """
         source: dir, target: single po file
