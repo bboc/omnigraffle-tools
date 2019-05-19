@@ -10,12 +10,12 @@ ogtranslate:
 	rtf2md:
 		- can't find all text through XML, test plist parser @done
 		- write a more robust extractor for RTF that better identifies the actual text @done
-		- pick up all the usecases in the illustrations that are currently not supported @estimate(1h) @later
+		- pick up all the usecases in the illustrations that are currently not supported @estimate(1h) @na
 		- fix all the usecases in the rtf2markdown converter @estimate(4h) @later
 		- check other bullet types @later
 		- check for nested lists?? @later
 		- process special characters (like  ➤) @later
-		- encode/decode unicode characters @later
+		- encode/decode unicode characters @na
 		- bold/regular/italics using OpenSans @later
 	Translation workflow:
 		- extract filename from user data @na @done
@@ -23,16 +23,20 @@ ogtranslate:
 		- add ability to process one canvas only @later
 		- create meaningful context information @done
 	
-	Implementation for Illustration:
+	Basic implementation for S3 illustrations:
 	- implement extractor @estimate(4h) @done
 		- add markdown to translation memory @na @done
 		- dump markdown to file if filename is present @na @done
 	- implement injector @estimate(4h)
-		- read markdown files
-		- reat pot files
-		- quick and dirty rtf builder
+		- iterate over all source 
+		- make copy of source file
+		- read markdown files @na
+		- reat pot files @na
+		- quick and dirty rtf builder @na
 	- refactor: create one folder with name of omnigraffle file, in that is the pot-file and all markdown files @done
-	- make a full test run with illustrations and fix all problems @estimate(4h)
+	Test Run with illustrations:
+		- make a full test run with illustrations and list all problems @estimate(2h)
+		- fix all problems @estimate(4h)
 	Extending the usecase: @later
 		- make test run with posters @estimate(30min)
 		- make a test run with the primer @estimate(30min)
