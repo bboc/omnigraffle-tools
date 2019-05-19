@@ -49,6 +49,7 @@ class NewTranslationMemory(object):
 
 class TranslationMemoryFile(object):
     """A translation memory that comes from a PO file."""
+
     def __init__(self, filename):
         self.filename = filename
         self.tm = {}
