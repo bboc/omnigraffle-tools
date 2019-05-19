@@ -149,7 +149,7 @@ class OmniGraffleTranslator(object):
 
         # then save result to new document
         fp = open(target_filename, 'wb')
-        plistlib.dump(self.doc, fp, fmt=plistlib.FMT_XML, sort_keys=True, skipkeys=False)
+        plistlib.dump(pw.doc, fp, fmt=plistlib.FMT_XML, sort_keys=True, skipkeys=False)
 
     def copy_document(self, source, target):
         """
@@ -202,9 +202,8 @@ class OmniGraffleTranslator(object):
 
         for item in pw.translatables:
             item.raw_text = SUBSTITUTE
-
         fp = open('out.graffle', 'wb')
-        plistlib.dump(self.doc, fp, fmt=plistlib.FMT_XML, sort_keys=True, skipkeys=False)
+        plistlib.dump(pw.doc, fp, fmt=plistlib.FMT_XML, sort_keys=True, skipkeys=False)
 
     def parse_commandline(self):
         """Parse commandline, do some checks and return args."""
