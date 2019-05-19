@@ -120,6 +120,7 @@ class OmniGraffleTranslator(object):
                          os.path.join(translations, document_basename, document_basename + '.po')]:
                 if os.path.exists(file):
                     tm_file = file
+                    break
             else:
                 raise Exception('po-file not found', translations, document_basename)
         else:
@@ -173,12 +174,13 @@ class OmniGraffleTranslator(object):
         Read translations from <filename>.md file that is either in <directory>, or in
         subdirectory <basename>. Raise exception if file not found.
         """
-        for file in [os.path.join(directory, filename),
-                     os.path.join(directory, document_basename, filename)]:
+        for file in [os.path.join(directory, filename + '.md'),
+                     os.path.join(directory, document_basename, filename + '.md')]:
+            print(file)
             if os.path.exists(file):
                 with open(file, 'r') as fp:
                     return fp.read()
-            raise Exception('file not found', filename, directory, document_basename)
+        raise Exception('file not found', filename, directory, document_basename)
 
     def cmd_dump(self):
         print("dump file as text")
