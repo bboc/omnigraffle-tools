@@ -191,8 +191,8 @@ class OmniGraffleTranslator(object):
     @staticmethod
     def get_parser():
         parser = argparse.ArgumentParser(fromfile_prefix_chars='@',
-                                         description="Translate canvases in OmniGraffle 6.",
-                                         epilog="If a file fails, simply try again.")
+                                         description="Translate canvases in OmniGraffle Documents",
+                                         epilog="Documents must be uncrompressed flat files.")
 
         subparsers = parser.add_subparsers()
         OmniGraffleTranslator.cmd_extract_subparser(subparsers)
