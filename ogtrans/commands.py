@@ -176,7 +176,6 @@ class OmniGraffleTranslator(object):
         """
         for file in [os.path.join(directory, filename + '.md'),
                      os.path.join(directory, document_basename, filename + '.md')]:
-            print(file)
             if os.path.exists(file):
                 with open(file, 'r') as fp:
                     return fp.read()
