@@ -4,7 +4,7 @@ import os
 import tempfile
 import unittest
 
-from ogtool.commands import OmniGraffleTranslator
+from ogtrans.commands import OmniGraffleTranslator
 
 
 class TranslateTests(unittest.TestCase):
