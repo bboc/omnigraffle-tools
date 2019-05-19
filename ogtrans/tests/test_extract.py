@@ -11,7 +11,6 @@ class ExtractTranslationsTests(unittest.TestCase):
 
     def setUp(self):
         self.test_data = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test-data')
-
         self.tmp_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tmp')
         if not os.path.exists(self.tmp_path):
             os.makedirs(self.tmp_path)
