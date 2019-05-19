@@ -30,7 +30,7 @@ class PlistWalker(object):
                     return 'RTF-TEXT'
             return item
 
-        tabbed(self.path.to_string())
+        # tabbed(self.path.to_string())
 
         # do whatever with this item...
         self.selector(current)
@@ -95,7 +95,7 @@ class PlistTextExtractor(PlistWalker):
             return False
 
     def collect_translatables(self, canvas=None):
-        for canvas in pw.doc['Sheets']:
+        for canvas in self.doc['Sheets']:
             # TODO: add filter for single canvas here
             self.path = Path(canvas['SheetTitle'])
             self.walk_plist(canvas)

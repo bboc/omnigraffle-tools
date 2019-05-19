@@ -36,7 +36,7 @@ class Translatable(object):
     def klass(self):
         return self.og_object['Class']
 
-    def translate_text(self, translation):
+    def translate(self, translation):
         """Convert translation to rtf and insert into object."""
         self.rtf.markdown = translation
         self.raw_text = self.rtf.raw_rtf

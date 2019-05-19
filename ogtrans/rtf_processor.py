@@ -26,7 +26,9 @@ class RtfObject(object):
     @markdown.setter
     def markdown(self, value):
         """Create raw_rtf from markdown."""
-        self.raw_rtf = '\n'.join(self.header, md2rtf(value))
+        if value:  # TODO: this test should not be necessary, right?
+            self.raw_rtf = '\n'.join([self.header, md2rtf(value)])
+            self.preprocess()
 
 
 HEADER_MARKERS = [

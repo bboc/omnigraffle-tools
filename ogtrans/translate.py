@@ -3,7 +3,7 @@ from collections import defaultdict
 
 import polib
 import re
-
+import logging
 
 BASENAME_PATTERN = re.compile("(?P<basename>[^//]+?)\.graffle(/data\.plist)?$")
 
@@ -67,4 +67,4 @@ class TranslationMemoryFile(object):
         if t and t in self.tm:
             return self.tm[t]
         else:
-            raise Exception('text not in translation memory: "%s"' % text)
+            logging.error('text not in translation memory: "%s"' % text)

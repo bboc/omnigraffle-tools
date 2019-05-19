@@ -115,13 +115,15 @@ class OmniGraffleTranslator(object):
         #               folder: check if contains PO file with basename, open that
         #               otherwise: open subfolder/basename.po
         if os.path.isdir(translations):
+            po_file_only = False
             for file in [os.path.join(translations, document_basename + '.po'),
-                     os.path.join(directory, document_basename, document_basename +'.po')]:
+                         os.path.join(translations, document_basename, document_basename + '.po')]:
                 if os.path.exists(file):
                     tm_file = file
             else:
                 raise Exception('po-file not found', translations, document_basename)
         else:
+            po_file_only = True
             tm_file = translations
         tm = TranslationMemoryFile(tm_file)
         # open plist and extract translatables
@@ -130,8 +132,8 @@ class OmniGraffleTranslator(object):
         # go through translatables and translate using PO and md files (if present)
         # TODO: tl might be empty, what then?
         for item in pw.translatables:
-            if item.destination:
-                tl = self.get_translation_from_file(item.destination, translations)
+            if item.destination and not po_file_only: 
+                tl = self.get_translation_from_file(item.destination, translations, document_basename)
             else:
                 tl = tm.translate(item.rtf.markdown)
                 item.rtf.markdown = tl
@@ -183,10 +185,10 @@ class OmniGraffleTranslator(object):
         pw = PlistWalker(self.args.source, verbose=True)
         pw.walk_plist(pw.doc)
 
-    def cmd_replace(self):
+    def cmd_test(self):
         print("test: replace text and write back ")
 
-        pw = PlistWriteTester(self.args.source)
+        pw = PlistTextExtractor(self.args.source)
         pw.walk_plist(pw.doc)
 
         SUBSTITUTE = dedent(r"""
@@ -235,8 +237,9 @@ class OmniGraffleTranslator(object):
 
         subparsers = parser.add_subparsers()
         OmniGraffleTranslator.cmd_extract_subparser(subparsers)
-        OmniGraffleTranslator.cmd_dump_subparser(subparsers)
         OmniGraffleTranslator.cmd_translate_subparser(subparsers)
+        OmniGraffleTranslator.cmd_dump_subparser(subparsers)
+        OmniGraffleTranslator.cmd_test_subparser(subparsers)
         return parser
 
     @staticmethod
@@ -260,6 +263,14 @@ class OmniGraffleTranslator(object):
                         help='an OmniGraffle file')
         OmniGraffleTranslator.add_verbose(sp)
         sp.set_defaults(func=OmniGraffleTranslator.cmd_dump)
+
+    def cmd_test_subparser(subparsers):
+        sp = subparsers.add_parser('test',
+                                   help="Run some test code")
+        sp.add_argument('source', type=str,
+                        help='an OmniGraffle file')
+        OmniGraffleTranslator.add_verbose(sp)
+        sp.set_defaults(func=OmniGraffleTranslator.cmd_test)
 
     @staticmethod
     def cmd_translate_subparser(subparsers):

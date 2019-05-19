@@ -27,7 +27,7 @@ class TranslateTests(unittest.TestCase):
                          loglevel=30,
                          source=os.path.join(self.test_data, 'rtfprocessor-tests.graffle'),
                          target=tmpfolder.name,
-                         translations=os.path.join(self.test_data, 'translations', 'rtfprocessor-tests.po'),)
+                         translations=os.path.join(self.test_data, 'translations', 'rtfprocessor-tests', 'rtfprocessor-tests.po'),)
 
         tr = OmniGraffleTranslator(args)
         tr.args.func(tr)
