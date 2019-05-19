@@ -2,6 +2,7 @@ import re
 from .rtf2md import rtf2md
 from .md2rtf import md2rtf
 
+
 class RtfObject(object):
 
     def __init__(self, raw_rtf):

@@ -41,4 +41,3 @@ class Translatable(object):
         self.rtf.markdown = translation
         self.raw_text = self.rtf.raw_rtf
 
-
