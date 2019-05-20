@@ -24,12 +24,15 @@ class BasicTests(unittest.TestCase):
                             {\*\expandedcolortbl;;}
                             \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc\partightenfactor0""").strip(),
                         contents=r'\f0\fs32 \cf0 some plain text',
-                        fonts={'0': 'HelveticaNeue'})
+                        fonts={'0': 'HelveticaNeue'},
+                        content_prefix=r'\f0\fs32 \cf0')
         result = split_rtf(text)
 
         self.assertEqual(result['header'], expected['header'])
         self.assertEqual(result['contents'], expected['contents'])
         self.assertEqual(result['fonts'], expected['fonts'])
+        self.assertEqual(result['content_prefix'], expected['content_prefix'])
+
         # fail on new elements that haven't been tested above!
         self.assertEqual(result, expected)
 
@@ -71,7 +74,8 @@ class BasicTests(unittest.TestCase):
                             \f1 \uc0\u9642
                             \f0     }and another one\
                             """).strip(),
-                        fonts={'0': 'HelveticaNeue', '1': 'LucidaGrande'})
+                        fonts={'0': 'HelveticaNeue', '1': 'LucidaGrande'},
+                        content_prefix='')
         result = split_rtf(text)
 
         self.assertEqual(result['header'], expected['header'])

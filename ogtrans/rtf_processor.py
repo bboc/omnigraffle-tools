@@ -1,5 +1,5 @@
 import re
-from .rtf2md import rtf2md
+from .rtf2md import rtf2md, content_start
 from .md2rtf import md2rtf
 
 
@@ -10,6 +10,7 @@ class RtfObject(object):
         self.fonts = []
         self.header = ''
         self.contents = ''
+        self.content_prefix = ''
         self.preprocess()
 
     def preprocess(self):
@@ -18,6 +19,7 @@ class RtfObject(object):
         self.header = result['header']
         self.contents = result['contents']
         self.fonts = result['fonts']
+        self.content_prefix = result['content_prefix']
 
     @property
     def markdown(self):
@@ -27,7 +29,7 @@ class RtfObject(object):
     def markdown(self, value):
         """Create raw_rtf from markdown."""
         if value:  # TODO: this test should not be necessary, right?
-            self.raw_rtf = '\n'.join([self.header, md2rtf(value)])
+            self.raw_rtf = '\n'.join([self.header, self.content_prefix + md2rtf(value)])
             self.preprocess()
 
 
@@ -65,6 +67,7 @@ def split_rtf(text):
     """Split RTF in header and contents, extract font table."""
     header = []
     contents = []
+    content_prefix = None
     in_header = True
     for line in text.strip().split('\n'):
         if not line.strip():
@@ -79,6 +82,12 @@ def split_rtf(text):
                 continue
             else:
                 in_header = False
+        if content_prefix is None:
+            m = content_start.match(line)
+            if m:
+                content_prefix = m.group('controlwords').strip()
+            else:
+                content_prefix = ''
         contents.append(line)
 
-    return dict(header='\n'.join(header), contents='\n'.join(contents)[:-1].strip(), fonts=fonts)
+    return dict(header='\n'.join(header), contents='\n'.join(contents)[:-1].strip(), fonts=fonts, content_prefix=content_prefix)

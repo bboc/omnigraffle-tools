@@ -17,6 +17,10 @@ ogtranslate:
 		- process special characters (like  ➤) @later
 		- encode/decode unicode characters @na
 		- bold/regular/italics using OpenSans @later
+	md2rtf:
+		- bold
+		- italics
+		- make sure cotrolwords in first line are kept @done
 	Translation workflow:
 		- extract filename from user data @na @done
 		- set fixed length if present in userdata (see if that is possible in PO files!!)
@@ -27,9 +31,9 @@ ogtranslate:
 	- implement extractor @estimate(4h) @done
 		- add markdown to translation memory @na @done
 		- dump markdown to file if filename is present @na @done
-	- implement injector @estimate(4h)
+	- implement injector @estimate(4h) @done
 		- iterate over all source @done
-		- make copy of source file
+		- make copy of source file @done
 		- read markdown files @na @done
 		- read pot files @na @done
 		- quick and dirty rtf builder @na @done
