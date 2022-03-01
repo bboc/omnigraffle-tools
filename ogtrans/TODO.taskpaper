@@ -20,6 +20,8 @@ ogtranslate:
 	md2rtf:
 		- bold
 		- italics
+		- unicode characters @na
+		- lists
 		- make sure cotrolwords in first line are kept @done
 	Translation workflow:
 		- extract filename from user data @na @done
@@ -40,7 +42,13 @@ ogtranslate:
 	- refactor: create one folder with name of omnigraffle file, in that is the pot-file and all markdown files @done
 	Test Run with illustrations:
 		- make a full test run with illustrations and list all problems @estimate(2h)
-		- fix all problems @estimate(4h)
+		fix all problems: @estimate(4h)
+			- encode/decode unicode-ascii: @na
+				- \\uc0\\u10227
+				- What\\'92s missing? (\'hh is specified on the defined charaacter set_
+			- proper handling of linebreaks in md2rtf
+			- some controlwords in the content prefix are not recognized properly
+			- some lists are not recocnizend
 	Extending the usecase: @later
 		- make test run with posters @estimate(30min)
 		- make a test run with the primer @estimate(30min)

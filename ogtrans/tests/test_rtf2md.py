@@ -68,5 +68,14 @@ class MoreTests(unittest.TestCase):
         self.assertEqual(rtf2md(text), expected)
 
 
+class EncodingTests(unittest.TestCase):
+    def test_unicode_character_text(self):
+        """Unicode text should be extracted correctly."""
+        text = r'\f0\fs32 \cf0 some weird \uc0\u10227 character'
+
+        expected = 'some weird ⟳ character'
+        self.assertEqual(rtf2md(text), expected)
+
+
 if __name__ == "__main__":
     unittest.main()

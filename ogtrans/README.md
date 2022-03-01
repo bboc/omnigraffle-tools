@@ -103,6 +103,31 @@ From the examples I looked at, it's pretty simple to parse the RTF:
 - when inserting, insert the new text after the control words, and use the font table to set the correct fonts. Colors should not matter, as the illustrations use just one color for each text
 - the conversion should use minimal whitespace, spaces instead of tabs, but preserve line breaks
 
+
+### Character Encoding:
+
+Two kinds of encoding encountered so far:
+
+#### Hex values in the current character set
+
+E.g. `\'hh`	
+
+A hexadecimal value, based on the specified character set (may be used to identify 8-bit values).
+
+#### Unicode characters
+
+e.g.  \uc0\\u10227
+
+`\uN` a single unicode character, N represents the Unicode character value expressed as a decimal number. RTF control words generally accept signed 16-bit numbers as arguments. For this reason, Unicode values greater than 32767 must be expressed as negative numbers.
+
+This controlword may be followed directly by equivalent character(s) in ANSI representation. Number of alternative ascii characters is specified in preceding \uN keyword, the reader should then ignore the next N characters (plus the space that terminates this keyword!!)
+
+
+
+`\ucN`	the number of bytes corresponding to a given \uN Unicode character. Valid for the current scope, application must keep track of the current value (e.g. through a stack). I have only seen `\uc0` so far.
+
+
+
 # How to store and retrieve translations
 
 Notes: Crowdin treats each multiline string in a POT file as one single string, i.e. all small changes require a full re-translation. Also there's no support for Markdown content on POT-files, so that translators have to take care to write correct Markdown. For HTML tags there's at least a way to copy them from source to translation. So it's essential to only have simple formatting in the po-files (bold, italics), and put longer texts into am Markdown file
@@ -168,7 +193,7 @@ A simple translation memory based on po-files is used to translate most texts, l
 
 ## RTF Resources, Converters and Libraries
 
-- [RTF 1.5 spec](http://www.biblioscape.com/rtf15_spec.htm#Heading9)
+- [RTF 1.5 spec](		)
 - [wikipedia entry](https://en.wikipedia.org/wiki/Rich_Text_Format)
 - [writing your own RTF converter](https://www.codeproject.com/Articles/27431/Writing-Your-Own-RTF-Converter)
 - [RTF Pocket Guide](https://www.oreilly.com/library/view/rtf-pocket-guide/9781449302047/ch01.html)
